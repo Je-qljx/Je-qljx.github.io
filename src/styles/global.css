@@ -1,0 +1,364 @@
+/* ==========================================================================
+   Design system — Je-qljx.github.io
+   --------------------------------------------------------------------------
+   Identity: developer personal homepage. Signature element: terminal/CLI
+   hero motif — a dark inset terminal panel on a light page. The palette is
+   cool paper-white + deep blue-ink + phosphor green (terminal phosphor),
+   deliberately avoiding warm-cream/serif/terracotta, near-black/acid-green,
+   and broadsheet-hairline looks.
+
+   Light-first: `:root` carries the light theme; `[data-theme="dark"]`
+   overrides. All text/bg pairs meet WCAG AA (>= 4.5:1) in BOTH themes —
+   see .omo/evidence/task-2-contrast.txt for the computed table.
+
+   Fonts: self-hosted via @fontsource (no CDN). CJK glyphs fall back to the
+   system stack (PingFang SC / Microsoft YaHei / Noto Sans SC) — no CJK
+   webfonts, no external requests.
+   ========================================================================== */
+
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource-variable/instrument-sans';
+
+/* --------------------------------------------------------------------------
+   1. Tokens — light theme (default)
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* Color — surfaces */
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --surface-muted: #edf1f5;
+
+  /* Color — text */
+  --text: #1b2432;
+  --text-secondary: #46525f;
+  --text-muted: #5b6b7c;
+
+  /* Color — accent (phosphor green) */
+  --accent: #0e7a4f;
+  --accent-strong: #0a5c3c;
+  --accent-soft: #e3f2ea;
+  --on-accent: #ffffff;
+
+  /* Color — lines */
+  --border: #d9e0e8;
+  --border-strong: #c3ccd6;
+
+  /* Color — terminal panel (signature element) */
+  --terminal-bg: #0f141b;
+  --terminal-text: #dce8e0;
+  --terminal-accent: #4ade80;
+  --terminal-border: #232b36;
+
+  /* Color — selection */
+  --selection-bg: #0e7a4f;
+  --selection-text: #ffffff;
+
+  /* Color — shadows (cool-tinted) */
+  --shadow-color: 210 25% 20%;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.06);
+  --shadow-md: 0 4px 12px rgb(var(--shadow-color) / 0.08);
+  --shadow-lg: 0 12px 32px rgb(var(--shadow-color) / 0.12);
+
+  /* Typography — families */
+  --font-display: 'Bricolage Grotesque Variable', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-body: 'Instrument Sans Variable', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas,
+    'Liberation Mono', monospace;
+
+  /* Typography — scale */
+  --text-display: clamp(2.75rem, 7vw, 4.75rem);
+  --text-h1: clamp(2rem, 4.5vw, 3rem);
+  --text-h2: clamp(1.5rem, 3vw, 2.125rem);
+  --text-h3: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.8125rem;
+  --text-mono: 0.875rem;
+
+  /* Typography — leading */
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.65;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-terminal: 10px;
+  --radius-full: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-base: 250ms var(--ease-out);
+
+  /* Z-index */
+  --z-header: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-skip-link: 1000;
+}
+
+/* --------------------------------------------------------------------------
+   2. Tokens — dark theme
+   -------------------------------------------------------------------------- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Color — surfaces */
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-muted: #1c232c;
+
+  /* Color — text */
+  --text: #e6edf3;
+  --text-secondary: #a8b3bf;
+  --text-muted: #8b96a3;
+
+  /* Color — accent (phosphor green) */
+  --accent: #3fb950;
+  --accent-strong: #56d364;
+  --accent-soft: #12261b;
+  --on-accent: #0d1117;
+
+  /* Color — lines */
+  --border: #2d3642;
+  --border-strong: #3d4854;
+
+  /* Color — terminal panel (signature element) */
+  --terminal-bg: #05080c;
+  --terminal-text: #dce8e0;
+  --terminal-accent: #4ade80;
+  --terminal-border: #1f2731;
+
+  /* Color — selection */
+  --selection-bg: #3fb950;
+  --selection-text: #0d1117;
+
+  /* Color — shadows (deeper in dark) */
+  --shadow-color: 210 40% 4%;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.4);
+  --shadow-md: 0 4px 12px rgb(var(--shadow-color) / 0.5);
+  --shadow-lg: 0 12px 32px rgb(var(--shadow-color) / 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   3. Base element styles
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-weight: 650;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-h1);
+}
+
+h2 {
+  font-size: var(--text-h2);
+}
+
+h3 {
+  font-size: var(--text-h3);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-strong);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+}
+
+code {
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-muted);
+  color: var(--text);
+}
+
+pre {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-muted);
+  color: var(--text);
+  line-height: var(--leading-snug);
+}
+
+pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Keyboard focus — visible everywhere, WCAG 2.4.7 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* Scrollbar (WebKit) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background-color: var(--border-strong);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+  background-clip: padding-box;
+}
+
+/* --------------------------------------------------------------------------
+   4. Utility classes
+   -------------------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(var(--space-4), 5vw, var(--space-8));
+}
+
+.section {
+  padding-block: var(--space-16);
+}
+
+@media (min-width: 48rem) {
+  .section {
+    padding-block: var(--space-24);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: var(--z-skip-link);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   5. Reduced motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
