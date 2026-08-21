@@ -17,7 +17,7 @@ const featured = (await getCollection('projects'))
   <!-- 首页：hero / 关于 / 精选项目 / 联系 -->
   <section class="hero">
     <div class="container hero-inner">
-      <p class="hero-eyebrow" data-reveal>~/</p>
+      <p class="hero-eyebrow" data-reveal>~/Je</p>
       <h1 class="hero-name" data-reveal data-reveal-delay="60">{config.name}</h1>
       <div
         class="terminal"
@@ -27,10 +27,10 @@ const featured = (await getCollection('projects'))
         data-reveal-delay="120"
       >
         <div class="terminal-bar">
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-title">~/whoami</span>
+          <span class="terminal-btn terminal-btn-close" aria-hidden="true"></span>
+          <span class="terminal-btn terminal-btn-min" aria-hidden="true"></span>
+          <span class="terminal-btn terminal-btn-max" aria-hidden="true"></span>
+          <span class="terminal-title">~/Je/whoami</span>
         </div>
         <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>whoami</span><span class="terminal-cursor" aria-hidden="true"></span></code>
 <code class="terminal-output" data-output hidden>{config.name}</code>
@@ -42,7 +42,7 @@ const featured = (await getCollection('projects'))
 
   <section class="section" id="about">
     <div class="container">
-      <p class="section-eyebrow" data-reveal>~/about</p>
+      <p class="section-eyebrow" data-reveal>~/Je/about</p>
       <h2 data-reveal data-reveal-delay="60">关于</h2>
       <div class="about-grid">
         <img
@@ -59,12 +59,13 @@ const featured = (await getCollection('projects'))
           aria-label="终端输出：个人简介"
           data-reveal
           data-reveal-delay="80"
+          data-typing-gate
         >
           <div class="terminal-bar">
-            <span class="terminal-dot" aria-hidden="true"></span>
-            <span class="terminal-dot" aria-hidden="true"></span>
-            <span class="terminal-dot" aria-hidden="true"></span>
-            <span class="terminal-title">~/about</span>
+            <span class="terminal-btn terminal-btn-close" aria-hidden="true"></span>
+            <span class="terminal-btn terminal-btn-min" aria-hidden="true"></span>
+            <span class="terminal-btn terminal-btn-max" aria-hidden="true"></span>
+            <span class="terminal-title">~/Je/about</span>
           </div>
           <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat about.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
 <code class="terminal-output" data-output hidden>{config.bio}</code></pre>
@@ -75,7 +76,7 @@ const featured = (await getCollection('projects'))
 
   <section class="section" id="projects">
     <div class="container">
-      <p class="section-eyebrow" data-reveal>~/projects</p>
+      <p class="section-eyebrow" data-reveal>~/Je/projects</p>
       <h2 data-reveal data-reveal-delay="60">精选项目</h2>
       <ul class="featured-grid">
         {
@@ -100,7 +101,7 @@ const featured = (await getCollection('projects'))
 
   <section class="section" id="contact">
     <div class="container">
-      <p class="section-eyebrow" data-reveal>~/contact</p>
+      <p class="section-eyebrow" data-reveal>~/Je/contact</p>
       <h2 data-reveal data-reveal-delay="60">联系</h2>
       <p class="contact-intro" data-reveal data-reveal-delay="80">
         欢迎通过邮件或 GitHub 联系我。
@@ -162,7 +163,6 @@ const featured = (await getCollection('projects'))
     }
 
     var TYPE_INTERVAL = 90;
-    var OUTPUT_INTERVAL = 30;
     var NEXT_DELAY = 400;
 
     function typeOutput(job, done) {
@@ -187,29 +187,66 @@ const featured = (await getCollection('projects'))
           }
           done();
         }
-      }, OUTPUT_INTERVAL);
+      }, TYPE_INTERVAL);
     }
 
-    function typeJob(index) {
-      var job = jobs[index];
+    function typeOne(job, done) {
       var i = 0;
       var timer = window.setInterval(function () {
         i += 1;
         job.cmd.textContent = job.text.slice(0, i);
         if (i >= job.text.length) {
           window.clearInterval(timer);
-          typeOutput(job, function () {
-            if (index < jobs.length - 1) {
-              window.setTimeout(function () {
-                typeJob(index + 1);
-              }, NEXT_DELAY);
-            }
-          });
+          typeOutput(job, done);
         }
       }, TYPE_INTERVAL);
     }
 
-    typeJob(0);
+    // Ungated terminals play on load, in document order. Gated ones start
+    // when their section trips the same viewport band that flips the header
+    // path (identical rootMargin on the same section), so the text and the
+    // address swap together.
+    var immediate = [];
+    var gated = [];
+    for (var j = 0; j < jobs.length; j += 1) {
+      var term = jobs[j].cmd.closest('.terminal');
+      var section = term ? term.closest('section[id]') : null;
+      if (term && term.hasAttribute('data-typing-gate') && section) {
+        gated.push({ job: jobs[j], section: section });
+      } else {
+        immediate.push(jobs[j]);
+      }
+    }
+
+    function runChain(list, k) {
+      if (k >= list.length) return;
+      typeOne(list[k], function () {
+        window.setTimeout(function () {
+          runChain(list, k + 1);
+        }, NEXT_DELAY);
+      });
+    }
+    runChain(immediate, 0);
+
+    function watchGated(k) {
+      if (k >= gated.length) return;
+      var item = gated[k];
+      var io = new IntersectionObserver(
+        function (entries) {
+          for (var e = 0; e < entries.length; e += 1) {
+            if (!entries[e].isIntersecting) continue;
+            io.disconnect();
+            typeOne(item.job, function () {
+              watchGated(k + 1);
+            });
+            break;
+          }
+        },
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      );
+      io.observe(item.section);
+    }
+    watchGated(0);
   })();
 </script>
 
@@ -259,11 +296,46 @@ const featured = (await getCollection('projects'))
     border-bottom: 1px solid var(--terminal-border);
   }
 
-  .terminal-dot {
-    width: 0.625rem;
-    height: 0.625rem;
+  .terminal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.75rem;
+    height: 0.75rem;
     border-radius: var(--radius-full);
-    background-color: var(--terminal-border);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.55);
+  }
+
+  .terminal-btn::before {
+    content: '';
+  }
+
+  .terminal-btn-close {
+    background-color: #ff5f57;
+  }
+
+  .terminal-btn-close::before {
+    content: '×';
+  }
+
+  .terminal-btn-min {
+    background-color: #febc2e;
+  }
+
+  .terminal-btn-min::before {
+    content: '-';
+  }
+
+  .terminal-btn-max {
+    background-color: #28c840;
+  }
+
+  .terminal-btn-max::before {
+    content: '+';
   }
 
   .terminal-title {

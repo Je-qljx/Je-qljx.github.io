@@ -81,9 +81,9 @@ const nav = [
     function init() {
       var el = document.querySelector('.site-name-text');
       if (!el) return;
-      var initial = el.textContent;
-      var base = location.pathname.replace(/^\/+|\/+$/g, '');
-      if (!base) base = initial;
+      var root = el.textContent;
+      var path = location.pathname.replace(/^\/+|\/+$/g, '');
+      var base = path ? root + '/' + path : root;
 
       function setText(next, animate) {
         if (!next || el.textContent === next) return;
@@ -116,8 +116,8 @@ const nav = [
           for (var s = 0; s < sections.length; s += 1) {
             if (visible.indexOf(sections[s]) !== -1) active = sections[s];
           }
-          if (active) lastActive = active.id;
-          var next = active ? active.id : window.scrollY === 0 ? base : lastActive;
+          if (active) lastActive = root + '/' + active.id;
+          var next = active ? lastActive : window.scrollY === 0 ? base : lastActive;
           setText(next, true);
         },
         { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
@@ -173,10 +173,9 @@ const nav = [
     display: inline-flex;
     align-items: baseline;
     gap: var(--space-1);
-    font-family: var(--font-display);
-    font-weight: 650;
-    font-size: 1.125rem;
-    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    color: var(--accent);
     text-decoration: none;
   }
 
