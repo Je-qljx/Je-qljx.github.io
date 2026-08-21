@@ -56,10 +56,16 @@ const year = new Date().getFullYear();
     text-decoration: none;
     font-size: var(--text-small);
     font-weight: 500;
-    transition: color var(--transition-fast);
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    background-position: 0 calc(100% - 2px);
+    transition: color var(--transition-fast),
+      background-size var(--transition-base);
   }
 
   .footer-social a:hover {
     color: var(--accent);
+    background-size: 100% 2px;
   }
 </style>

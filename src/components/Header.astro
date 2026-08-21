@@ -66,6 +66,10 @@ const nav = [
         /* ignore */
       }
       sync();
+      // One-shot pop feedback (CSS-gated to motion-enabled sessions).
+      btn.classList.remove('theme-pop');
+      void btn.offsetWidth;
+      btn.classList.add('theme-pop');
     });
 
     sync();
@@ -80,6 +84,13 @@ const nav = [
     background-color: color-mix(in srgb, var(--bg) 82%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
+    transition: background-color var(--transition-base),
+      box-shadow var(--transition-base);
+  }
+
+  .site-header.is-scrolled {
+    background-color: color-mix(in srgb, var(--bg) 92%, transparent);
+    box-shadow: var(--shadow-sm);
   }
 
   .header-inner {
@@ -122,11 +133,17 @@ const nav = [
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
-    transition: color var(--transition-fast);
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    background-position: 0 calc(100% - 2px);
+    transition: color var(--transition-fast),
+      background-size var(--transition-base);
   }
 
   .nav-list a:hover {
     color: var(--accent);
+    background-size: 100% 2px;
   }
 
   .theme-toggle {
@@ -142,11 +159,33 @@ const nav = [
     color: var(--text);
     cursor: pointer;
     transition: border-color var(--transition-fast),
-      background-color var(--transition-fast);
+      background-color var(--transition-fast),
+      transform var(--transition-fast);
   }
 
   .theme-toggle:hover {
     border-color: var(--border-strong);
+  }
+
+  .theme-toggle:active {
+    transform: scale(0.88);
+  }
+
+  /* One-shot pop on theme switch (gated to motion-enabled sessions) */
+  html.motion-ok .theme-toggle.theme-pop {
+    animation: theme-pop 400ms var(--ease-out);
+  }
+
+  @keyframes theme-pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(0.82);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
   .theme-toggle-icon {

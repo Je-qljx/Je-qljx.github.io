@@ -24,15 +24,20 @@ const dateText = pubDate.toLocaleDateString('zh-CN', {
   <div class="container section">
     <article class="project-article">
       <header class="article-head">
-        <p class="article-eyebrow">~/projects/{project.id}</p>
-        <h1>{title}</h1>
-        <p class="article-meta">
+        <p class="article-eyebrow" data-reveal>~/projects/{project.id}</p>
+        <h1 data-reveal data-reveal-delay="60">{title}</h1>
+        <p class="article-meta" data-reveal data-reveal-delay="120">
           <time datetime={pubDate.toISOString()}>{dateText}</time>
         </p>
-        <ul class="tag-list" aria-label="项目标签">
+        <ul
+          class="tag-list"
+          aria-label="项目标签"
+          data-reveal
+          data-reveal-delay="160"
+        >
           {tags.map((tag) => <li class="tag">{tag}</li>)}
         </ul>
-        <div class="article-links">
+        <div class="article-links" data-reveal data-reveal-delay="200">
           {githubUrl && <a href={githubUrl}>源码</a>}
           {demoUrl && <a href={demoUrl}>在线演示</a>}
         </div>

@@ -17,16 +17,18 @@ const dateFormat = new Intl.DateTimeFormat('zh-CN', {
   <section class="blog">
     <div class="container blog-inner">
       <header class="blog-head">
-        <p class="blog-eyebrow" aria-hidden="true">~/blog</p>
-        <h1>博客</h1>
-        <p class="blog-lead">记录开发过程中的思考、踩坑与总结。</p>
+        <p class="blog-eyebrow" aria-hidden="true" data-reveal>~/blog</p>
+        <h1 data-reveal data-reveal-delay="60">博客</h1>
+        <p class="blog-lead" data-reveal data-reveal-delay="120">
+          记录开发过程中的思考、踩坑与总结。
+        </p>
       </header>
 
       <ul class="post-list">
         {
-          posts.map((post) => (
-            <li>
-              <article class="post-card">
+          posts.map((post, i) => (
+            <li data-reveal data-reveal-delay={(i % 4) * 80}>
+              <article class="post-card" data-tilt>
                 <h2 class="post-title">
                   <a href={`/blog/${post.id}/`}>{post.data.title}</a>
                 </h2>
@@ -87,18 +89,48 @@ const dateFormat = new Intl.DateTimeFormat('zh-CN', {
   }
 
   .post-card {
+    position: relative;
     padding: var(--space-6);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background-color: var(--surface);
     box-shadow: var(--shadow-sm);
-    transition: border-color var(--transition-fast),
-      box-shadow var(--transition-fast);
+    cursor: pointer;
+    transform: perspective(900px) translateY(var(--lift, 0px))
+      rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg))
+      scale(var(--press, 1));
+    transition: transform var(--transition-base),
+      border-color var(--transition-fast), box-shadow var(--transition-fast);
   }
 
   .post-card:hover {
-    border-color: var(--border-strong);
+    --lift: -3px;
+    border-color: var(--accent);
     box-shadow: var(--shadow-md);
+  }
+
+  .post-card:active {
+    --press: 0.98;
+  }
+
+  /* Cursor spotlight — script feeds --mx/--my while the pointer moves */
+  .post-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      9rem circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 65%
+    );
+    transition: opacity var(--transition-fast);
+  }
+
+  html.motion-ok .post-card.is-tilting::after {
+    opacity: 1;
   }
 
   .post-title {

@@ -362,3 +362,166 @@ pre code {
     scroll-behavior: auto !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   6. Motion & interaction
+   --------------------------------------------------------------------------
+   Interaction feedback: click ripple + press, scroll progress bar,
+   scroll-triggered reveal, back-to-top, card tilt & cursor spotlight.
+
+   Contract: everything is visible by default. The script adds
+   `html.motion-ok` only when JS runs AND motion is allowed, so reduced
+   motion / no-JS users never see hidden or animated states. Decorative
+   motion uses the `translate` property (independent of `transform`), so
+   it never fights the per-card transform stack (`--lift`/`--press`/
+   `--rx`/`--ry`).
+   -------------------------------------------------------------------------- */
+
+/* Tokens */
+:root {
+  --reveal-distance: 18px;
+  --reveal-duration: 600ms;
+  --ripple-duration: 550ms;
+  --ripple-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* Scroll progress bar — top edge of the viewport, terminal phosphor */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-overlay);
+  height: 3px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--accent), var(--terminal-accent));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  visibility: hidden;
+}
+
+html.motion-ok .scroll-progress {
+  visibility: visible;
+}
+
+/* Click ripple — expanding accent ring spawned at the pointer position */
+.ripple {
+  position: fixed;
+  z-index: var(--z-modal);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    var(--ripple-color) 0%,
+    color-mix(in srgb, var(--accent) 24%, transparent) 45%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple-grow var(--ripple-duration) var(--ease-out) forwards;
+}
+
+@keyframes ripple-grow {
+  0% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Scroll reveal — fade + rise on entering the viewport.
+   Stagger via `--reveal-delay` (set by data-reveal-delay in the script).
+   The script removes [data-reveal] after the transition settles so the
+   element returns to its own transition rhythm (card tilt, etc.). */
+html.motion-ok [data-reveal] {
+  opacity: 0;
+  translate: 0 var(--reveal-distance);
+  transition:
+    opacity var(--reveal-duration) var(--ease-out),
+    translate var(--reveal-duration) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.motion-ok [data-reveal].is-revealed {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Back-to-top — appears after scrolling, smooth-scrolls to the top */
+.back-to-top {
+  position: fixed;
+  right: clamp(var(--space-4), 4vw, var(--space-8));
+  bottom: clamp(var(--space-4), 4vw, var(--space-8));
+  z-index: var(--z-overlay);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(0.5rem);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base),
+    visibility var(--transition-base),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  border-color: var(--accent);
+}
+
+.back-to-top:active {
+  transform: scale(0.92);
+}
+
+/* Card tilt — while the pointer moves over a card, the script updates
+   `--rx`/`--ry` (rotation) and `--mx`/`--my` (spotlight position).
+   Hover lift and press scale ride on the same transform stack via
+   `--lift` and `--press`, so CSS hover and JS tilt never conflict. */
+html.motion-ok .is-tilting {
+  transition-duration: 80ms, 250ms, 250ms;
+}
+
+@media (hover: hover) {
+  .featured-card:hover,
+  .project-card:hover,
+  .post-card:hover {
+    --lift: -3px;
+  }
+}
+
+/* Tag hover — a tiny rise, mono badge stays readable */
+.tag {
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .tag:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.1);
+  }
+}

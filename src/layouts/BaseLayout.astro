@@ -66,11 +66,18 @@ const ogImageUrl = `${siteUrl}/og-image.png`;
     <slot name="head" />
   </head>
   <body>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     <a class="skip-link" href="#main">跳到主要内容</a>
     <Header />
     <main id="main">
       <slot />
     </main>
     <Footer />
+    <button class="back-to-top" type="button" aria-label="返回顶部">
+      <span aria-hidden="true">↑</span>
+    </button>
+    <script>
+      import '../scripts/motion';
+    </script>
   </body>
 </html>

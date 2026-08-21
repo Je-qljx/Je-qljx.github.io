@@ -17,11 +17,19 @@ const featured = (await getCollection('projects'))
   <!-- 首页：hero / 关于 / 精选项目 / 联系 -->
   <section class="hero">
     <div class="container hero-inner">
-      <p class="hero-eyebrow">~/</p>
-      <h1 class="hero-name">{config.name}</h1>
-      <p class="hero-tagline">{config.tagline}</p>
+      <p class="hero-eyebrow" data-reveal>~/</p>
+      <h1 class="hero-name" data-reveal data-reveal-delay="60">{config.name}</h1>
+      <p class="hero-tagline" data-reveal data-reveal-delay="120">
+        {config.tagline}
+      </p>
 
-      <div class="terminal" role="img" aria-label="终端签名：whoami">
+      <div
+        class="terminal"
+        role="img"
+        aria-label="终端签名：whoami"
+        data-reveal
+        data-reveal-delay="200"
+      >
         <div class="terminal-bar">
           <span class="terminal-dot" aria-hidden="true"></span>
           <span class="terminal-dot" aria-hidden="true"></span>
@@ -36,8 +44,8 @@ const featured = (await getCollection('projects'))
 
   <section class="section" id="about">
     <div class="container">
-      <p class="section-eyebrow">~/about</p>
-      <h2>关于</h2>
+      <p class="section-eyebrow" data-reveal>~/about</p>
+      <h2 data-reveal data-reveal-delay="60">关于</h2>
       <div class="about-grid">
         <img
           class="about-avatar"
@@ -45,20 +53,23 @@ const featured = (await getCollection('projects'))
           alt={`${config.name} 的头像`}
           width="160"
           height="160"
+          data-reveal
         />
-        <p class="about-bio">{config.bio}</p>
+        <p class="about-bio" data-reveal data-reveal-delay="80">
+          {config.bio}
+        </p>
       </div>
     </div>
   </section>
 
   <section class="section" id="projects">
     <div class="container">
-      <p class="section-eyebrow">~/projects</p>
-      <h2>精选项目</h2>
+      <p class="section-eyebrow" data-reveal>~/projects</p>
+      <h2 data-reveal data-reveal-delay="60">精选项目</h2>
       <ul class="featured-grid">
         {
-          featured.map((project) => (
-            <li class="featured-card">
+          featured.map((project, i) => (
+            <li class="featured-card" data-tilt data-reveal data-reveal-delay={i * 100}>
               <h3 class="featured-title">
                 <a href={`/projects/${project.id}/`}>{project.data.title}</a>
               </h3>
@@ -70,18 +81,26 @@ const featured = (await getCollection('projects'))
           ))
         }
       </ul>
-      <a class="all-link" href="/projects/">查看全部项目</a>
+      <a class="all-link" href="/projects/" data-reveal data-reveal-delay="120">
+        查看全部项目
+      </a>
     </div>
   </section>
 
   <section class="section" id="contact">
     <div class="container">
-      <p class="section-eyebrow">~/contact</p>
-      <h2>联系</h2>
-      <p class="contact-intro">欢迎通过邮件或 GitHub 联系我。</p>
+      <p class="section-eyebrow" data-reveal>~/contact</p>
+      <h2 data-reveal data-reveal-delay="60">联系</h2>
+      <p class="contact-intro" data-reveal data-reveal-delay="80">
+        欢迎通过邮件或 GitHub 联系我。
+      </p>
       <div class="contact-links">
-        <a class="contact-link" href={`mailto:${config.socials.email}`}>邮件</a>
-        <a class="contact-link" href={config.socials.github}>GitHub</a>
+        <a class="contact-link" href={`mailto:${config.socials.email}`} data-reveal>
+          邮件
+        </a>
+        <a class="contact-link" href={config.socials.github} data-reveal data-reveal-delay="80">
+          GitHub
+        </a>
       </div>
     </div>
   </section>
@@ -270,6 +289,7 @@ const featured = (await getCollection('projects'))
   }
 
   .featured-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -278,13 +298,42 @@ const featured = (await getCollection('projects'))
     border-radius: var(--radius-lg);
     background-color: var(--surface);
     box-shadow: var(--shadow-sm);
-    transition: border-color var(--transition-base),
-      box-shadow var(--transition-base);
+    cursor: pointer;
+    transform: perspective(900px) translateY(var(--lift, 0px))
+      rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg))
+      scale(var(--press, 1));
+    transition: transform var(--transition-base),
+      border-color var(--transition-base), box-shadow var(--transition-base);
   }
 
   .featured-card:hover {
-    border-color: var(--border-strong);
+    --lift: -3px;
+    border-color: var(--accent);
     box-shadow: var(--shadow-md);
+  }
+
+  .featured-card:active {
+    --press: 0.98;
+  }
+
+  /* Cursor spotlight — script feeds --mx/--my while the pointer moves */
+  .featured-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      9rem circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 65%
+    );
+    transition: opacity var(--transition-fast);
+  }
+
+  html.motion-ok .featured-card.is-tilting::after {
+    opacity: 1;
   }
 
   .featured-title {
@@ -353,11 +402,15 @@ const featured = (await getCollection('projects'))
     font-weight: 600;
     text-decoration: none;
     transition: border-color var(--transition-fast),
-      color var(--transition-fast);
+      color var(--transition-fast), transform var(--transition-fast);
   }
 
   .contact-link:hover {
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  .contact-link:active {
+    transform: scale(0.95);
   }
 </style>

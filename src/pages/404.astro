@@ -5,12 +5,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="页面未找到 · Je">
   <section class="notfound">
     <div class="container notfound-inner">
-      <p class="notfound-code" aria-hidden="true">404</p>
-      <h1 class="notfound-title">页面未找到</h1>
-      <p class="notfound-desc">
+      <p class="notfound-code" aria-hidden="true" data-reveal>404</p>
+      <h1 class="notfound-title" data-reveal data-reveal-delay="80">
+        页面未找到
+      </h1>
+      <p class="notfound-desc" data-reveal data-reveal-delay="160">
         你访问的页面不存在，或已被移动。
       </p>
-      <a class="notfound-link" href="/">返回首页</a>
+      <a class="notfound-link" href="/" data-reveal data-reveal-delay="240">
+        返回首页
+      </a>
     </div>
   </section>
 </BaseLayout>
@@ -51,11 +55,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--on-accent);
     text-decoration: none;
     font-weight: 600;
-    transition: background-color var(--transition-fast);
+    transition: background-color var(--transition-fast),
+      transform var(--transition-fast);
   }
 
   .notfound-link:hover {
     background-color: var(--accent-strong);
     color: var(--on-accent);
+  }
+
+  .notfound-link:active {
+    transform: scale(0.95);
   }
 </style>
