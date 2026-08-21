@@ -19,16 +19,12 @@ const featured = (await getCollection('projects'))
     <div class="container hero-inner">
       <p class="hero-eyebrow" data-reveal>~/</p>
       <h1 class="hero-name" data-reveal data-reveal-delay="60">{config.name}</h1>
-      <p class="hero-tagline" data-reveal data-reveal-delay="120">
-        {config.tagline}
-      </p>
-
       <div
         class="terminal"
         role="img"
         aria-label="终端签名：whoami"
         data-reveal
-        data-reveal-delay="200"
+        data-reveal-delay="120"
       >
         <div class="terminal-bar">
           <span class="terminal-dot" aria-hidden="true"></span>
@@ -38,6 +34,23 @@ const featured = (await getCollection('projects'))
         </div>
         <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>whoami</span><span class="terminal-cursor" aria-hidden="true"></span></code>
 <code class="terminal-output" data-output hidden>{config.name}</code></pre>
+      </div>
+
+      <div
+        class="terminal"
+        role="img"
+        aria-label="终端输出：身份标签"
+        data-reveal
+        data-reveal-delay="200"
+      >
+        <div class="terminal-bar">
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-title">~/tagline</span>
+        </div>
+        <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat tagline.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
+<code class="terminal-output" data-output hidden>{config.tagline}</code></pre>
       </div>
     </div>
   </section>
@@ -55,9 +68,22 @@ const featured = (await getCollection('projects'))
           height="160"
           data-reveal
         />
-        <p class="about-bio" data-reveal data-reveal-delay="80">
-          {config.bio}
-        </p>
+        <div
+          class="terminal terminal-wide"
+          role="img"
+          aria-label="终端输出：个人简介"
+          data-reveal
+          data-reveal-delay="80"
+        >
+          <div class="terminal-bar">
+            <span class="terminal-dot" aria-hidden="true"></span>
+            <span class="terminal-dot" aria-hidden="true"></span>
+            <span class="terminal-dot" aria-hidden="true"></span>
+            <span class="terminal-title">~/about</span>
+          </div>
+          <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat about.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
+<code class="terminal-output" data-output hidden>{config.bio}</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -108,25 +134,64 @@ const featured = (await getCollection('projects'))
 
 <script is:inline>
   (function () {
-    var cmd = document.querySelector('[data-type]');
-    var out = document.querySelector('[data-output]');
-    if (!cmd || !out) return;
-    var text = cmd.textContent;
+    var terminals = document.querySelectorAll('.terminal');
+    if (!terminals.length) return;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // One typing job per terminal, in document order.
+    var jobs = [];
+    for (var t = 0; t < terminals.length; t += 1) {
+      var cmd = terminals[t].querySelector('[data-type]');
+      var out = terminals[t].querySelector('[data-output]');
+      if (!cmd || !out) continue;
+      jobs.push({
+        cmd: cmd,
+        out: out,
+        cursor: terminals[t].querySelector('.terminal-cursor'),
+        text: '',
+      });
+    }
+    if (!jobs.length) return;
+
     if (reduced) {
-      out.hidden = false;
+      for (var r = 0; r < jobs.length; r += 1) {
+        jobs[r].out.hidden = false;
+      }
       return;
     }
-    cmd.textContent = '';
-    var i = 0;
-    var timer = window.setInterval(function () {
-      i += 1;
-      cmd.textContent = text.slice(0, i);
-      if (i >= text.length) {
-        window.clearInterval(timer);
-        out.hidden = false;
-      }
-    }, 90);
+
+    // Clear every command up front so waiting terminals show an idle prompt.
+    for (var c = 0; c < jobs.length; c += 1) {
+      jobs[c].text = jobs[c].cmd.textContent;
+      jobs[c].cmd.textContent = '';
+    }
+
+    var TYPE_INTERVAL = 90;
+    var NEXT_DELAY = 400;
+
+    function typeJob(index) {
+      var job = jobs[index];
+      var i = 0;
+      var timer = window.setInterval(function () {
+        i += 1;
+        job.cmd.textContent = job.text.slice(0, i);
+        if (i >= job.text.length) {
+          window.clearInterval(timer);
+          job.out.hidden = false;
+          var isLast = index === jobs.length - 1;
+          if (!isLast && job.cursor) {
+            job.cursor.classList.add('is-done');
+          }
+          if (!isLast) {
+            window.setTimeout(function () {
+              typeJob(index + 1);
+            }, NEXT_DELAY);
+          }
+        }
+      }, TYPE_INTERVAL);
+    }
+
+    typeJob(0);
   })();
 </script>
 
@@ -150,15 +215,8 @@ const featured = (await getCollection('projects'))
   }
 
   .hero-name {
-    margin: 0 0 var(--space-4);
+    margin: 0 0 var(--space-8);
     font-size: var(--text-display);
-  }
-
-  .hero-tagline {
-    max-width: 36rem;
-    margin: 0 0 var(--space-12);
-    font-size: var(--text-h3);
-    color: var(--text-secondary);
   }
 
   /* terminal signature */
@@ -169,6 +227,14 @@ const featured = (await getCollection('projects'))
     border-radius: var(--radius-terminal);
     background-color: var(--terminal-bg);
     box-shadow: var(--shadow-lg);
+  }
+
+  .terminal + .terminal {
+    margin-top: var(--space-4);
+  }
+
+  .terminal-wide {
+    max-width: 40rem;
   }
 
   .terminal-bar {
@@ -222,6 +288,10 @@ const featured = (await getCollection('projects'))
     animation: cursor-blink 1.1s steps(2, start) infinite;
   }
 
+  .terminal-cursor.is-done {
+    display: none;
+  }
+
   @keyframes cursor-blink {
     to {
       visibility: hidden;
@@ -230,6 +300,8 @@ const featured = (await getCollection('projects'))
 
   .terminal-output {
     color: var(--terminal-text);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
   }
 
   .terminal-output[hidden] {
@@ -264,12 +336,6 @@ const featured = (await getCollection('projects'))
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-  }
-
-  .about-bio {
-    max-width: 40rem;
-    margin: 0;
-    color: var(--text-secondary);
   }
 
   /* featured projects */
