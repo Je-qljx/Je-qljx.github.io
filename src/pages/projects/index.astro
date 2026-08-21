@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout title="项目" description="Je 的开源项目列表">
+  <div class="container section">
+    <header class="page-head">
+      <p class="page-eyebrow">~/projects</p>
+      <h1>项目</h1>
+      <p class="page-intro">一些正在维护或已经完成的开源项目。</p>
+    </header>
+
+    <ul class="project-grid">
+      {
+        projects.map((project) => (
+          <li class="project-card">
+            <h2 class="project-title">
+              <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+            </h2>
+            <p class="project-desc">{project.data.description}</p>
+            <ul class="tag-list" aria-label="项目标签">
+              {project.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+            </ul>
+            <div class="project-links">
+              {project.data.githubUrl && (
+                <a class="project-link" href={project.data.githubUrl}>
+                  源码
+                </a>
+              )}
+              {project.data.demoUrl && (
+                <a class="project-link" href={project.data.demoUrl}>
+                  在线演示
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: var(--space-12);
+  }
+
+  .page-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .page-intro {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .project-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base),
+      transform var(--transition-base), border-color var(--transition-base);
+  }
+
+  .project-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .project-title {
+    margin: 0;
+    font-size: var(--text-h3);
+  }
+
+  .project-title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .project-title a:hover {
+    color: var(--accent);
+  }
+
+  .project-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag {
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+
+  .project-links {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: auto;
+  }
+
+  .project-link {
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+</style>
