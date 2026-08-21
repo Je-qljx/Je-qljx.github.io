@@ -76,6 +76,75 @@ const nav = [
   })();
 </script>
 
+<script is:inline>
+  (function () {
+    function init() {
+      var el = document.querySelector('.site-name-text');
+      if (!el) return;
+      var initial = el.textContent;
+      var base = location.pathname.replace(/^\/+|\/+$/g, '');
+      if (!base) base = initial;
+
+      function setText(next, animate) {
+        if (!next || el.textContent === next) return;
+        el.textContent = next;
+        if (!animate || !document.documentElement.classList.contains('motion-ok')) {
+          return;
+        }
+        el.classList.remove('name-pop');
+        void el.offsetWidth;
+        el.classList.add('name-pop');
+      }
+
+      var sections = document.querySelectorAll('main section[id]');
+      if (!sections.length) {
+        setText(base, false);
+        return;
+      }
+
+      var visible = [];
+      var lastActive = null;
+      var io = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i += 1) {
+            var entry = entries[i];
+            var idx = visible.indexOf(entry.target);
+            if (entry.isIntersecting && idx === -1) visible.push(entry.target);
+            if (!entry.isIntersecting && idx !== -1) visible.splice(idx, 1);
+          }
+          var active = null;
+          for (var s = 0; s < sections.length; s += 1) {
+            if (visible.indexOf(sections[s]) !== -1) active = sections[s];
+          }
+          if (active) lastActive = active.id;
+          var next = active ? active.id : window.scrollY === 0 ? base : lastActive;
+          setText(next, true);
+        },
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      );
+      for (var t = 0; t < sections.length; t += 1) io.observe(sections[t]);
+
+      // IO only fires on intersection changes, so a smooth scroll landing
+      // exactly at the top would never re-evaluate. Cheap guarded check.
+      window.addEventListener(
+        'scroll',
+        function () {
+          if (!visible.length && window.scrollY === 0) {
+            setText(base, true);
+          }
+        },
+        { passive: true }
+      );
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
 <style>
   .site-header {
     position: sticky;
@@ -186,6 +255,21 @@ const nav = [
     100% {
       transform: scale(1);
     }
+  }
+
+  @keyframes name-pop {
+    0% {
+      opacity: 0.55;
+      transform: translateY(0.15em);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  html.motion-ok .site-name-text.name-pop {
+    animation: name-pop 280ms var(--ease-out);
   }
 
   .theme-toggle-icon {

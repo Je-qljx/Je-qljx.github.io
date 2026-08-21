@@ -14,7 +14,7 @@ export const config: SiteConfig = {
   name: 'Je', // TODO(user): replace with real content
   handle: '@Je-qljx', // TODO(user): replace with real content
   tagline: '学生 · 开发爱好者 · AI 探索者',
-  bio: '我是一名学生，热爱编程与软件开发，同时也是一位 AI 探索者，喜欢尝试新事物，用代码和 AI 创造有趣的作品。',
+  bio: '相信有趣的点子值得被实现——用技术把痛点解决，将难点落实。',
   socials: {
     github: 'https://github.com/Je-qljx', // TODO(user): replace with real content
     email: 'TODO(user): replace with real content',

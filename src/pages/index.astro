@@ -131,11 +131,16 @@ const featured = (await getCollection('projects'))
       var line = cmd.closest('code');
       var out = line ? line.nextElementSibling : null;
       if (!out || !out.hasAttribute('data-output')) continue;
+      // The final command of each window keeps its blinking cursor.
+      var box = cmd.closest('.terminal');
+      var windowCmds = box ? box.querySelectorAll('[data-type]') : [cmd];
       jobs.push({
         cmd: cmd,
         out: out,
         cursor: cmd.nextElementSibling,
         text: '',
+        outText: '',
+        keepCursor: windowCmds[windowCmds.length - 1] === cmd,
       });
     }
     if (!jobs.length) return;
@@ -147,14 +152,43 @@ const featured = (await getCollection('projects'))
       return;
     }
 
-    // Clear every command up front so waiting prompts show an idle cursor.
+    // Capture texts and clear content up front: waiting prompts show an idle
+    // cursor, and outputs reveal empty so nothing flashes before printing.
     for (var c = 0; c < jobs.length; c += 1) {
       jobs[c].text = jobs[c].cmd.textContent;
       jobs[c].cmd.textContent = '';
+      jobs[c].outText = jobs[c].out.textContent;
+      jobs[c].out.textContent = '';
     }
 
     var TYPE_INTERVAL = 90;
+    var OUTPUT_INTERVAL = 30;
     var NEXT_DELAY = 400;
+
+    function typeOutput(job, done) {
+      if (!job.outText) {
+        done();
+        return;
+      }
+      job.out.hidden = false;
+      // The cursor trails the growing output text, like a live feed.
+      var j = 0;
+      var timer = window.setInterval(function () {
+        j += 1;
+        job.out.textContent = job.outText.slice(0, j);
+        if (job.cursor) {
+          job.out.appendChild(job.cursor);
+        }
+        if (j >= job.outText.length) {
+          window.clearInterval(timer);
+          // Retire the cursor unless it belongs to the window's final command.
+          if (!job.keepCursor && job.cursor) {
+            job.cursor.classList.add('is-done');
+          }
+          done();
+        }
+      }, OUTPUT_INTERVAL);
+    }
 
     function typeJob(index) {
       var job = jobs[index];
@@ -164,16 +198,13 @@ const featured = (await getCollection('projects'))
         job.cmd.textContent = job.text.slice(0, i);
         if (i >= job.text.length) {
           window.clearInterval(timer);
-          job.out.hidden = false;
-          var isLast = index === jobs.length - 1;
-          if (!isLast && job.cursor) {
-            job.cursor.classList.add('is-done');
-          }
-          if (!isLast) {
-            window.setTimeout(function () {
-              typeJob(index + 1);
-            }, NEXT_DELAY);
-          }
+          typeOutput(job, function () {
+            if (index < jobs.length - 1) {
+              window.setTimeout(function () {
+                typeJob(index + 1);
+              }, NEXT_DELAY);
+            }
+          });
         }
       }, TYPE_INTERVAL);
     }
