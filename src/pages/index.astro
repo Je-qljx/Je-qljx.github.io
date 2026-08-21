@@ -22,7 +22,7 @@ const featured = (await getCollection('projects'))
       <div
         class="terminal"
         role="img"
-        aria-label="终端签名：whoami"
+        aria-label="终端会话：whoami 与身份标签"
         data-reveal
         data-reveal-delay="120"
       >
@@ -33,23 +33,8 @@ const featured = (await getCollection('projects'))
           <span class="terminal-title">~/whoami</span>
         </div>
         <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>whoami</span><span class="terminal-cursor" aria-hidden="true"></span></code>
-<code class="terminal-output" data-output hidden>{config.name}</code></pre>
-      </div>
-
-      <div
-        class="terminal"
-        role="img"
-        aria-label="终端输出：身份标签"
-        data-reveal
-        data-reveal-delay="200"
-      >
-        <div class="terminal-bar">
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-dot" aria-hidden="true"></span>
-          <span class="terminal-title">~/tagline</span>
-        </div>
-        <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat tagline.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
+<code class="terminal-output" data-output hidden>{config.name}</code>
+<code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat tagline.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
 <code class="terminal-output" data-output hidden>{config.tagline}</code></pre>
       </div>
     </div>
@@ -134,20 +119,22 @@ const featured = (await getCollection('projects'))
 
 <script is:inline>
   (function () {
-    var terminals = document.querySelectorAll('.terminal');
-    if (!terminals.length) return;
+    var cmds = document.querySelectorAll('[data-type]');
+    if (!cmds.length) return;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // One typing job per terminal, in document order.
+    // One typing job per command line, in document order. Each command's
+    // output is the sibling <code data-output> right after its own line.
     var jobs = [];
-    for (var t = 0; t < terminals.length; t += 1) {
-      var cmd = terminals[t].querySelector('[data-type]');
-      var out = terminals[t].querySelector('[data-output]');
-      if (!cmd || !out) continue;
+    for (var i = 0; i < cmds.length; i += 1) {
+      var cmd = cmds[i];
+      var line = cmd.closest('code');
+      var out = line ? line.nextElementSibling : null;
+      if (!out || !out.hasAttribute('data-output')) continue;
       jobs.push({
         cmd: cmd,
         out: out,
-        cursor: terminals[t].querySelector('.terminal-cursor'),
+        cursor: cmd.nextElementSibling,
         text: '',
       });
     }
@@ -160,7 +147,7 @@ const featured = (await getCollection('projects'))
       return;
     }
 
-    // Clear every command up front so waiting terminals show an idle prompt.
+    // Clear every command up front so waiting prompts show an idle cursor.
     for (var c = 0; c < jobs.length; c += 1) {
       jobs[c].text = jobs[c].cmd.textContent;
       jobs[c].cmd.textContent = '';
@@ -227,10 +214,6 @@ const featured = (await getCollection('projects'))
     border-radius: var(--radius-terminal);
     background-color: var(--terminal-bg);
     box-shadow: var(--shadow-lg);
-  }
-
-  .terminal + .terminal {
-    margin-top: var(--space-4);
   }
 
   .terminal-wide {
