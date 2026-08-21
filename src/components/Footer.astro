@@ -1,0 +1,65 @@
+---
+import { config } from '../config';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-copy">
+      © {year} {config.name}
+    </p>
+    <ul class="footer-social">
+      <li>
+        <a href={config.socials.github} rel="me" target="_blank">
+          GitHub
+        </a>
+      </li>
+      <li>
+        <a href={`mailto:${config.socials.email}`}>邮箱</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    background-color: var(--surface-muted);
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .footer-copy {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--text-small);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-social a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-small);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+  }
+
+  .footer-social a:hover {
+    color: var(--accent);
+  }
+</style>
