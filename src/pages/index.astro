@@ -1,12 +1,363 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { config } from '../config';
+import avatar from '../assets/avatar.svg?url';
+
+const featured = (await getCollection('projects'))
+  .filter((project) => project.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
 ---
 
-<BaseLayout title="Je · 个人主页">
-  <section class="home">
-    <div class="container home-inner">
-      <h1>Je</h1>
-      <p>个人主页</p>
+<BaseLayout
+  title={`${config.name} · 个人主页`}
+  description={`${config.name} 的个人主页`}
+>
+  <!-- 首页：hero / 关于 / 精选项目 / 联系 -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="hero-eyebrow">~/</p>
+      <h1 class="hero-name">{config.name}</h1>
+      <p class="hero-tagline">{config.tagline}</p>
+
+      <div class="terminal" role="img" aria-label="终端签名：whoami">
+        <div class="terminal-bar">
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-title">~/whoami</span>
+        </div>
+        <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>whoami</span><span class="terminal-cursor" aria-hidden="true"></span></code>
+<code class="terminal-output" data-output hidden>{config.name}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="container">
+      <p class="section-eyebrow">~/about</p>
+      <h2>关于</h2>
+      <div class="about-grid">
+        <img
+          class="about-avatar"
+          src={avatar}
+          alt={`${config.name} 的头像`}
+          width="160"
+          height="160"
+        />
+        <p class="about-bio">{config.bio}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projects">
+    <div class="container">
+      <p class="section-eyebrow">~/projects</p>
+      <h2>精选项目</h2>
+      <ul class="featured-grid">
+        {
+          featured.map((project) => (
+            <li class="featured-card">
+              <h3 class="featured-title">
+                <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+              </h3>
+              <p class="featured-desc">{project.data.description}</p>
+              <ul class="tag-list" aria-label="项目标签">
+                {project.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="all-link" href="/projects/">查看全部项目</a>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <p class="section-eyebrow">~/contact</p>
+      <h2>联系</h2>
+      <p class="contact-intro">欢迎通过邮件或 GitHub 联系我。</p>
+      <div class="contact-links">
+        <a class="contact-link" href={`mailto:${config.socials.email}`}>邮件</a>
+        <a class="contact-link" href={config.socials.github}>GitHub</a>
+      </div>
     </div>
   </section>
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    var cmd = document.querySelector('[data-type]');
+    var out = document.querySelector('[data-output]');
+    if (!cmd || !out) return;
+    var text = cmd.textContent;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      out.hidden = false;
+      return;
+    }
+    cmd.textContent = '';
+    var i = 0;
+    var timer = window.setInterval(function () {
+      i += 1;
+      cmd.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        window.clearInterval(timer);
+        out.hidden = false;
+      }
+    }, 90);
+  })();
+</script>
+
+<style>
+  /* hero */
+  .hero {
+    padding-block: var(--space-16) var(--space-24);
+  }
+
+  @media (min-width: 48rem) {
+    .hero {
+      padding-block: var(--space-24);
+    }
+  }
+
+  .hero-eyebrow {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .hero-name {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-display);
+  }
+
+  .hero-tagline {
+    max-width: 36rem;
+    margin: 0 0 var(--space-12);
+    font-size: var(--text-h3);
+    color: var(--text-secondary);
+  }
+
+  /* terminal signature */
+  .terminal {
+    max-width: 34rem;
+    overflow: hidden;
+    border: 1px solid var(--terminal-border);
+    border-radius: var(--radius-terminal);
+    background-color: var(--terminal-bg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--terminal-border);
+  }
+
+  .terminal-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--terminal-border);
+  }
+
+  .terminal-title {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--terminal-text);
+    opacity: 0.7;
+  }
+
+  .terminal-body {
+    margin: 0;
+    padding: var(--space-4) var(--space-6);
+    overflow-x: auto;
+    border: 0;
+    background-color: transparent;
+    line-height: var(--leading-snug);
+  }
+
+  .terminal-prompt {
+    color: var(--terminal-accent);
+    font-weight: 600;
+  }
+
+  .terminal-cmd {
+    color: var(--terminal-text);
+  }
+
+  .terminal-cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.1em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background-color: var(--terminal-accent);
+    animation: cursor-blink 1.1s steps(2, start) infinite;
+  }
+
+  @keyframes cursor-blink {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  .terminal-output {
+    color: var(--terminal-text);
+  }
+
+  .terminal-output[hidden] {
+    display: none;
+  }
+
+  /* sections */
+  .section-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  /* about */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 48rem) {
+    .about-grid {
+      grid-template-columns: 10rem 1fr;
+    }
+  }
+
+  .about-avatar {
+    width: 10rem;
+    height: 10rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .about-bio {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  /* featured projects */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin: 0 0 var(--space-8);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .featured-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition-base),
+      box-shadow var(--transition-base);
+  }
+
+  .featured-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  .featured-title {
+    margin: 0;
+    font-size: var(--text-h3);
+  }
+
+  .featured-title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .featured-title a:hover {
+    color: var(--accent);
+  }
+
+  .featured-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag {
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+
+  .all-link {
+    font-weight: 600;
+  }
+
+  /* contact */
+  .contact-intro {
+    max-width: 36rem;
+    margin: 0 0 var(--space-8);
+    color: var(--text-secondary);
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color var(--transition-fast),
+      color var(--transition-fast);
+  }
+
+  .contact-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>
