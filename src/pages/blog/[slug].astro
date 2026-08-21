@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts
+    .filter((post) => !post.data.draft)
+    .map((post) => ({
+      params: { slug: post.id },
+      props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const dateFormat = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={`${post.data.title} · Je`} description={post.data.description}>
+  <article class="post">
+    <div class="container post-inner">
+      <header class="post-head">
+        <p class="post-eyebrow" aria-hidden="true">~/blog/{post.id}</p>
+        <h1>{post.data.title}</h1>
+        <p class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {dateFormat.format(post.data.pubDate)}
+          </time>
+          {
+            post.data.updatedDate && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span>更新于 {dateFormat.format(post.data.updatedDate)}</span>
+              </>
+            )
+          }
+        </p>
+        <p class="post-desc">{post.data.description}</p>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    padding-block: var(--space-16);
+  }
+
+  @media (min-width: 48rem) {
+    .post {
+      padding-block: var(--space-24);
+    }
+  }
+
+  .post-inner {
+    max-width: 44rem;
+  }
+
+  .post-head {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .post-meta {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+  }
+
+  .post-desc {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  /* 文章正文排版 —— 基于设计系统令牌 */
+  .prose {
+    font-size: var(--text-body);
+    line-height: var(--leading-normal);
+    color: var(--text);
+  }
+
+  .prose h2 {
+    margin-top: var(--space-12);
+    font-size: var(--text-h2);
+  }
+
+  .prose h3 {
+    margin-top: var(--space-8);
+    font-size: var(--text-h3);
+  }
+
+  .prose h2:first-child,
+  .prose h3:first-child {
+    margin-top: 0;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-6);
+  }
+
+  .prose li + li {
+    margin-top: var(--space-2);
+  }
+
+  .prose blockquote {
+    margin: 0 0 var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    border-left: 3px solid var(--accent);
+    background-color: var(--surface-muted);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary);
+  }
+
+  .prose hr {
+    margin: var(--space-8) 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .prose table {
+    width: 100%;
+    margin: 0 0 var(--space-4);
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+
+  .prose th,
+  .prose td {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .prose th {
+    background-color: var(--surface-muted);
+    font-weight: 600;
+  }
+</style>

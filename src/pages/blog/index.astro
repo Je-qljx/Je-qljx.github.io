@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const dateFormat = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title="博客 · Je" description="Je 的博客文章列表">
+  <section class="blog">
+    <div class="container blog-inner">
+      <header class="blog-head">
+        <p class="blog-eyebrow" aria-hidden="true">~/blog</p>
+        <h1>博客</h1>
+        <p class="blog-lead">记录开发过程中的思考、踩坑与总结。</p>
+      </header>
+
+      <ul class="post-list">
+        {
+          posts.map((post) => (
+            <li>
+              <article class="post-card">
+                <h2 class="post-title">
+                  <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+                </h2>
+                <p class="post-meta">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {dateFormat.format(post.data.pubDate)}
+                  </time>
+                </p>
+                <p class="post-desc">{post.data.description}</p>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog {
+    padding-block: var(--space-16);
+  }
+
+  @media (min-width: 48rem) {
+    .blog {
+      padding-block: var(--space-24);
+    }
+  }
+
+  .blog-inner {
+    max-width: 44rem;
+  }
+
+  .blog-head {
+    margin-bottom: var(--space-12);
+  }
+
+  .blog-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .blog-lead {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .post-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-list li + li {
+    margin-top: var(--space-6);
+  }
+
+  .post-card {
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .post-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  .post-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-h3);
+  }
+
+  .post-title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .post-title a:hover {
+    color: var(--accent);
+  }
+
+  .post-meta {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+  }
+
+  .post-desc {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+</style>
