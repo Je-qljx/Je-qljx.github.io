@@ -316,6 +316,8 @@ const featured = (await getCollection('projects'))
     /* Small-size rasterization snaps glyph ink ~1px above the circle
        center; measured via pixel centroid at native resolution. */
     transform: translateY(1px);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
   }
 
   .terminal-btn-close {
@@ -340,6 +342,10 @@ const featured = (await getCollection('projects'))
 
   .terminal-btn-max::before {
     content: '+';
+  }
+
+  .terminal:hover .terminal-btn::before {
+    opacity: 1;
   }
 
   .terminal-title {
