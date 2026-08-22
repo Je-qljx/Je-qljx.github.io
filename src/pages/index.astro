@@ -306,12 +306,16 @@ const featured = (await getCollection('projects'))
     font-family: var(--font-mono);
     font-size: 0.625rem;
     font-weight: 700;
+    -webkit-text-stroke: 0.4px currentColor;
     line-height: 1;
-    color: rgba(0, 0, 0, 0.55);
+    color: rgba(0, 0, 0, 0.65);
   }
 
   .terminal-btn::before {
     content: '';
+    /* Small-size rasterization snaps glyph ink ~1px above the circle
+       center; measured via pixel centroid at native resolution. */
+    transform: translateY(1px);
   }
 
   .terminal-btn-close {
@@ -392,6 +396,21 @@ const featured = (await getCollection('projects'))
 
   .terminal-output[hidden] {
     display: none;
+  }
+
+  /* Hero terminal keeps its final size while typing: reserve hidden
+     output lines instead of collapsing them, so the window never grows
+     mid-animation and content below stays put. */
+  .terminal:not(.terminal-wide) .terminal-output[hidden] {
+    display: inline;
+    visibility: hidden;
+  }
+
+  /* The animation script empties outputs up front to avoid flashing;
+     an empty inline box generates no line box, so anchor one with a
+     zero-width space and the reserved line survives until typing starts. */
+  .terminal:not(.terminal-wide) .terminal-output::before {
+    content: '\200B';
   }
 
   /* sections */
