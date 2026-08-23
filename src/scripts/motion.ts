@@ -202,12 +202,15 @@
       );
     }
 
-    /* Terminal selection frame — glides onto the hovered interactive
-       element and wraps it; hides over plain content. The rAF loop runs
-       only while the frame is catching up with its target. */
-    const FRAME_INTERACTIVE =
-      'a, button, .featured-card, .project-card, .post-card, .contact-link';
-    const FRAME_PAD = 6;
+    /* Terminal selection frame — glides onto the hovered link or button
+       and wraps it; hides over plain content. Glow elements (cards,
+       contact buttons) are excluded: they already carry the orange glow
+       and a green frame on top reads as noise. The rAF loop runs only
+       while the frame is catching up with its target. */
+    const FRAME_INTERACTIVE = 'a, button';
+    const FRAME_EXCLUDE =
+      '.featured-card, .project-card, .post-card, .contact-link';
+    const FRAME_PAD = 4;
 
     const selFrame = document.createElement('span');
     selFrame.className = 'ghost-frame';
@@ -255,10 +258,14 @@
     document.addEventListener(
       'mousemove',
       (event) => {
-        const target =
+        const hit =
           event.target instanceof Element
             ? event.target.closest(FRAME_INTERACTIVE)
             : null;
+        // Glow elements already have their own hover feedback; a frame
+        // on top would stack two competing effects.
+        const target =
+          hit && !hit.closest(FRAME_EXCLUDE) ? hit : null;
         if (!target) {
           if (frameShown) hideFrame();
           return;
