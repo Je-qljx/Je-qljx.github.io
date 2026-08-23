@@ -282,10 +282,32 @@ const featured = (await getCollection('projects'))
     border-radius: var(--radius-terminal);
     background-color: var(--terminal-bg);
     box-shadow: var(--shadow-lg);
+    transition:
+      border-color var(--transition-base),
+      box-shadow var(--transition-base);
   }
 
   .terminal-wide {
     max-width: 40rem;
+  }
+
+  .terminal:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--terminal-accent) 40%,
+      var(--terminal-border)
+    );
+    box-shadow:
+      var(--shadow-lg),
+      0 0 28px color-mix(in srgb, var(--terminal-accent) 14%, transparent);
+  }
+
+  .terminal:hover .terminal-bar {
+    background-color: color-mix(
+      in srgb,
+      var(--terminal-accent) 6%,
+      transparent
+    );
   }
 
   .terminal-bar {
