@@ -377,7 +377,7 @@ pre code {
    6. Motion & interaction
    --------------------------------------------------------------------------
    Interaction feedback: click ripple + press, scroll-triggered reveal,
-   back-to-top, card cursor spotlight, ghost terminal cursor.
+   back-to-top, card cursor spotlight, terminal selection frame.
 
    Contract: everything is visible by default. The script adds
    `html.motion-ok` only when JS runs AND motion is allowed, so reduced
@@ -467,34 +467,34 @@ html.motion-ok [data-reveal].is-revealed {
   }
 }
 
-/* Ghost terminal cursor — a phosphor block in the shape of the terminal
-   caret that trails the pointer with a slight lag and grows over
-   interactive elements. The element itself is created by the script, so
-   no-JS / reduced-motion / touch users never get one. The native cursor
-   stays visible; this block is purely decorative. */
-.ghost-cursor {
+/* Terminal selection frame — a thin phosphor outline that glides onto
+   the hovered interactive element and wraps it, like a terminal
+   selection highlight. Hidden over plain content. The element is
+   created by the script, so no-JS / reduced-motion / touch users never
+   get one. The native cursor stays visible; the frame is purely
+   decorative. Position and size ride on CSS vars fed by the script. */
+.ghost-frame {
   position: fixed;
   top: 0;
   left: 0;
   z-index: var(--z-modal);
-  width: 0.5rem;
-  height: 1rem;
+  width: var(--frame-w, 0px);
+  height: var(--frame-h, 0px);
   pointer-events: none;
-  background-color: var(--terminal-accent);
+  border: 1px solid var(--terminal-accent);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(
+    in srgb,
+    var(--terminal-accent) 8%,
+    transparent
+  );
   opacity: 0;
-  translate: var(--ghost-x, -100px) var(--ghost-y, -100px);
-  transition:
-    opacity var(--transition-fast),
-    scale var(--transition-fast);
+  translate: var(--frame-x, -100px) var(--frame-y, -100px);
+  transition: opacity var(--transition-fast);
 }
 
-.ghost-cursor.is-visible {
-  opacity: 0.8;
-}
-
-.ghost-cursor.is-active {
+.ghost-frame.is-visible {
   opacity: 1;
-  scale: 1.5;
 }
 
 /* Back-to-top — appears after scrolling, smooth-scrolls to the top */

@@ -1,15 +1,16 @@
 /**
  * Site-wide interaction motion — click feedback (ripple), scroll feedback
  * (header state, back-to-top), scroll-triggered reveal and hover feedback
- * (card cursor spotlight, ghost terminal cursor).
+ * (card cursor spotlight, terminal selection frame).
  *
  * Degradation contract:
  *  - No JS / JS error  -> everything stays visible (hidden states only
  *    exist under `html.motion-ok`, added here).
  *  - prefers-reduced-motion -> `motion-ok` is never added, so no reveal
- *    hiding, no ripples, no spotlight or ghost cursor; functional bits
- *    (back-to-top) remain.
- *  - Touch / coarse pointers -> spotlight and ghost cursor never attach.
+ *    hiding, no ripples, no spotlight or selection frame; functional
+ *    bits (back-to-top) remain.
+ *  - Touch / coarse pointers -> spotlight and selection frame never
+ *    attach.
  */
 (function () {
   'use strict';
@@ -201,61 +202,89 @@
       );
     }
 
-    /* Ghost terminal cursor — a phosphor block trailing the pointer with
-       a slight lag. The rAF loop runs only while the block is catching
-       up and stops once settled. */
-    const GHOST_INTERACTIVE = 'a, button, .featured-card, .project-card, .post-card, .contact-link';
-    const ghost = document.createElement('span');
-    ghost.className = 'ghost-cursor';
-    ghost.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(ghost);
+    /* Terminal selection frame — glides onto the hovered interactive
+       element and wraps it; hides over plain content. The rAF loop runs
+       only while the frame is catching up with its target. */
+    const FRAME_INTERACTIVE =
+      'a, button, .featured-card, .project-card, .post-card, .contact-link';
+    const FRAME_PAD = 6;
 
-    const ghostW = ghost.offsetWidth;
-    const ghostH = ghost.offsetHeight;
+    const selFrame = document.createElement('span');
+    selFrame.className = 'ghost-frame';
+    selFrame.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(selFrame);
 
-    let ghostX = 0;
-    let ghostY = 0;
-    let targetX = 0;
-    let targetY = 0;
-    let ghostRafId = 0;
-    let ghostShown = false;
+    let frameShown = false;
+    let frameRafId = 0;
+    let fx = 0;
+    let fy = 0;
+    let fw = 0;
+    let fh = 0;
+    let tx = 0;
+    let ty = 0;
+    let tw = 0;
+    let th = 0;
 
-    function ghostFrame() {
-      ghostRafId = 0;
-      ghostX += (targetX - ghostX) * 0.2;
-      ghostY += (targetY - ghostY) * 0.2;
-      ghost.style.setProperty('--ghost-x', `${(ghostX - ghostW / 2).toFixed(1)}px`);
-      ghost.style.setProperty('--ghost-y', `${(ghostY - ghostH / 2).toFixed(1)}px`);
+    function frameStep() {
+      frameRafId = 0;
+      fx += (tx - fx) * 0.25;
+      fy += (ty - fy) * 0.25;
+      fw += (tw - fw) * 0.25;
+      fh += (th - fh) * 0.25;
+      selFrame.style.setProperty('--frame-x', `${fx.toFixed(1)}px`);
+      selFrame.style.setProperty('--frame-y', `${fy.toFixed(1)}px`);
+      selFrame.style.setProperty('--frame-w', `${fw.toFixed(1)}px`);
+      selFrame.style.setProperty('--frame-h', `${fh.toFixed(1)}px`);
       const settled =
-        Math.abs(targetX - ghostX) < 0.3 && Math.abs(targetY - ghostY) < 0.3;
-      if (!settled) ghostRafId = window.requestAnimationFrame(ghostFrame);
+        Math.abs(tx - fx) < 0.5 &&
+        Math.abs(ty - fy) < 0.5 &&
+        Math.abs(tw - fw) < 0.5 &&
+        Math.abs(th - fh) < 0.5;
+      if (!settled) frameRafId = window.requestAnimationFrame(frameStep);
+    }
+
+    function hideFrame() {
+      frameShown = false;
+      selFrame.classList.remove('is-visible');
+      if (frameRafId) {
+        window.cancelAnimationFrame(frameRafId);
+        frameRafId = 0;
+      }
     }
 
     document.addEventListener(
       'mousemove',
       (event) => {
-        targetX = event.clientX;
-        targetY = event.clientY;
-        if (!ghostShown) {
-          ghostShown = true;
-          ghostX = targetX;
-          ghostY = targetY;
-          ghost.classList.add('is-visible');
+        const target =
+          event.target instanceof Element
+            ? event.target.closest(FRAME_INTERACTIVE)
+            : null;
+        if (!target) {
+          if (frameShown) hideFrame();
+          return;
         }
-        const interactive =
-          event.target instanceof Element &&
-          event.target.closest(GHOST_INTERACTIVE);
-        ghost.classList.toggle('is-active', Boolean(interactive));
-        if (!ghostRafId) {
-          ghostRafId = window.requestAnimationFrame(ghostFrame);
+        const rect = target.getBoundingClientRect();
+        tx = rect.left - FRAME_PAD;
+        ty = rect.top - FRAME_PAD;
+        tw = rect.width + FRAME_PAD * 2;
+        th = rect.height + FRAME_PAD * 2;
+        if (!frameShown) {
+          frameShown = true;
+          selFrame.classList.add('is-visible');
+          // First lock-on lands directly on the target instead of
+          // gliding in from a stale position.
+          fx = tx;
+          fy = ty;
+          fw = tw;
+          fh = th;
+        }
+        if (!frameRafId) {
+          frameRafId = window.requestAnimationFrame(frameStep);
         }
       },
       { passive: true },
     );
 
-    document.documentElement.addEventListener('mouseleave', () => {
-      ghost.classList.remove('is-visible', 'is-active');
-      ghostShown = false;
-    });
+    document.documentElement.addEventListener('mouseleave', hideFrame);
   }
 })();
