@@ -1,13 +1,13 @@
 /**
  * Site-wide interaction motion — click feedback (ripple, press), scroll
- * feedback (progress bar, header state, back-to-top) and hover micro
- * interactions (card tilt + cursor spotlight).
+ * feedback (progress bar, header state, back-to-top) and scroll-triggered
+ * reveal.
  *
  * Degradation contract:
  *  - No JS / JS error  -> everything stays visible (hidden states only
  *    exist under `html.motion-ok`, added here).
  *  - prefers-reduced-motion -> `motion-ok` is never added, so no reveal
- *    hiding, no ripples, no tilt; functional bits (back-to-top) remain.
+ *    hiding, no ripples; functional bits (back-to-top) remain.
  */
 (function () {
   'use strict';
@@ -136,81 +136,6 @@
       for (const el of revealElements) observer.observe(el);
     } else {
       for (const el of revealElements) el.classList.add('is-revealed');
-    }
-  }
-
-  /* ----------------------------------------------------------------------
-     Card tilt + cursor spotlight — only for precise pointers (mouse),
-     and only when motion is allowed.
-     ---------------------------------------------------------------------- */
-  if (
-    motionOk &&
-    window.matchMedia('(hover: hover) and (pointer: fine)').matches
-  ) {
-    const tiltElements = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-tilt]'),
-    );
-    if (tiltElements.length) {
-      const MAX_TILT = 3.5; // degrees
-
-      let rafId = 0;
-      let pending: HTMLElement | null = null;
-
-      function applyTilt(el: HTMLElement) {
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-        // Normalized pointer position relative to element center.
-        const nx = (pendingX - rect.left) / rect.width - 0.5;
-        const ny = (pendingY - rect.top) / rect.height - 0.5;
-        el.style.setProperty('--rx', `${(-ny * MAX_TILT * 2).toFixed(2)}deg`);
-        el.style.setProperty('--ry', `${(nx * MAX_TILT * 2).toFixed(2)}deg`);
-        el.style.setProperty(
-          '--mx',
-          `${(((pendingX - rect.left) / rect.width) * 100).toFixed(1)}%`,
-        );
-        el.style.setProperty(
-          '--my',
-          `${(((pendingY - rect.top) / rect.height) * 100).toFixed(1)}%`,
-        );
-      }
-
-      let pendingX = 0;
-      let pendingY = 0;
-
-      for (const el of tiltElements) {
-        el.addEventListener(
-          'mousemove',
-          (event) => {
-            pending = el;
-            pendingX = event.clientX;
-            pendingY = event.clientY;
-            if (rafId) return;
-            rafId = window.requestAnimationFrame(() => {
-              rafId = 0;
-              if (pending) {
-                pending.classList.add('is-tilting');
-                applyTilt(pending);
-              }
-            });
-          },
-          { passive: true },
-        );
-        el.addEventListener(
-          'mouseleave',
-          () => {
-            if (rafId) {
-              window.cancelAnimationFrame(rafId);
-              rafId = 0;
-            }
-            el.classList.remove('is-tilting');
-            el.style.removeProperty('--rx');
-            el.style.removeProperty('--ry');
-            el.style.removeProperty('--mx');
-            el.style.removeProperty('--my');
-          },
-          { passive: true },
-        );
-      }
     }
   }
 })();

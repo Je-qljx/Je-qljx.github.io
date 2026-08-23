@@ -28,7 +28,7 @@ const dateFormat = new Intl.DateTimeFormat('zh-CN', {
         {
           posts.map((post, i) => (
             <li data-reveal data-reveal-delay={(i % 4) * 80}>
-              <article class="post-card" data-tilt>
+              <article class="post-card">
                 <h2 class="post-title">
                   <a href={`/blog/${post.id}/`}>{post.data.title}</a>
                 </h2>
@@ -92,45 +92,18 @@ const dateFormat = new Intl.DateTimeFormat('zh-CN', {
     position: relative;
     padding: var(--space-6);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     background-color: var(--surface);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transform: perspective(900px) translateY(var(--lift, 0px))
-      rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg))
-      scale(var(--press, 1));
-    transition: transform var(--transition-base),
-      border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: box-shadow var(--transition-base);
   }
 
   .post-card:hover {
-    --lift: -3px;
-    border-color: var(--accent);
-    box-shadow: var(--shadow-md);
-  }
-
-  .post-card:active {
-    --press: 0.98;
-  }
-
-  /* Cursor spotlight — script feeds --mx/--my while the pointer moves */
-  .post-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(
-      9rem circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--accent) 12%, transparent),
-      transparent 65%
-    );
-    transition: opacity var(--transition-fast);
-  }
-
-  html.motion-ok .post-card.is-tilting::after {
-    opacity: 1;
+    box-shadow:
+      var(--shadow-md),
+      0 0 38px rgb(var(--shadow-color) / 0.4),
+      0 0 12px rgb(var(--shadow-color) / 0.3);
   }
 
   .post-title {

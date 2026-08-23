@@ -561,16 +561,13 @@ const featured = (await getCollection('projects'))
     color: var(--text);
     font-weight: 600;
     text-decoration: none;
-    transition: border-color var(--transition-fast),
-      color var(--transition-fast), transform var(--transition-fast);
+    transition: box-shadow var(--transition-base);
   }
 
   .contact-link:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .contact-link:active {
-    transform: scale(0.95);
+    box-shadow:
+      var(--shadow-md),
+      0 0 38px rgb(var(--shadow-color) / 0.4),
+      0 0 12px rgb(var(--shadow-color) / 0.3);
   }
 </style>
