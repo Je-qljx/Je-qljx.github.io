@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { config } from '../../config';
+---
+
+<BaseLayout title={`联系 · ${config.name}`} description={`联系 ${config.name} 的方式`}>
+  <div class="container section">
+    <header class="page-head">
+      <p class="page-eyebrow" data-reveal>~/contact</p>
+      <h1 data-reveal data-reveal-delay="60">联系</h1>
+      <p class="page-intro" data-reveal data-reveal-delay="120">
+        欢迎通过邮件或 GitHub 联系我。
+      </p>
+    </header>
+
+    <div class="contact-links">
+      <a
+        class="contact-link"
+        href={`mailto:${config.socials.email}`}
+        data-reveal
+        data-reveal-delay="160"
+      >
+        邮件
+      </a>
+      <a
+        class="contact-link"
+        href={config.socials.github}
+        data-reveal
+        data-reveal-delay="240"
+      >
+        GitHub
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: var(--space-12);
+  }
+
+  .page-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .page-intro {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: box-shadow var(--transition-base);
+  }
+
+  .contact-link:hover {
+    box-shadow:
+      var(--shadow-md),
+      0 0 38px rgb(var(--shadow-color) / 0.4),
+      0 0 12px rgb(var(--shadow-color) / 0.3);
+  }
+</style>

@@ -175,6 +175,12 @@ html {
 
 body {
   margin: 0;
+  /* Sticky footer: short pages (e.g. /contact/) still pin the footer to
+     the viewport bottom; main grows to fill the leftover space. */
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
@@ -184,6 +190,10 @@ body {
   text-rendering: optimizeLegibility;
   transition: background-color var(--transition-base),
     color var(--transition-base);
+}
+
+main {
+  flex: 1;
 }
 
 h1,
