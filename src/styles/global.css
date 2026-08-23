@@ -376,8 +376,8 @@ pre code {
 /* --------------------------------------------------------------------------
    6. Motion & interaction
    --------------------------------------------------------------------------
-   Interaction feedback: click ripple + press, scroll progress bar,
-   scroll-triggered reveal, back-to-top.
+   Interaction feedback: click ripple + press, scroll-triggered reveal,
+   back-to-top, card cursor spotlight, ghost terminal cursor.
 
    Contract: everything is visible by default. The script adds
    `html.motion-ok` only when JS runs AND motion is allowed, so reduced
@@ -436,6 +436,65 @@ html.motion-ok [data-reveal] {
 html.motion-ok [data-reveal].is-revealed {
   opacity: 1;
   translate: 0 0;
+}
+
+/* Card cursor spotlight — a soft glow that tracks the pointer inside
+   cards and contact buttons, layered over the static hover glow. The
+   script feeds `--mx`/`--my` and toggles `is-spotlighting` while the
+   pointer is over the element. JS-gated to motion-allowed sessions, and
+   the element only exists on fine-pointer devices. */
+@media (hover: hover) and (pointer: fine) {
+  .featured-card::after,
+  .project-card::after,
+  .post-card::after,
+  .contact-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      9rem circle at var(--mx, 50%) var(--my, 50%),
+      rgb(var(--shadow-color) / 0.16),
+      transparent 65%
+    );
+    transition: opacity var(--transition-fast);
+  }
+
+  html.motion-ok .is-spotlighting::after {
+    opacity: 1;
+  }
+}
+
+/* Ghost terminal cursor — a phosphor block in the shape of the terminal
+   caret that trails the pointer with a slight lag and grows over
+   interactive elements. The element itself is created by the script, so
+   no-JS / reduced-motion / touch users never get one. The native cursor
+   stays visible; this block is purely decorative. */
+.ghost-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-modal);
+  width: 0.5rem;
+  height: 1rem;
+  pointer-events: none;
+  background-color: var(--terminal-accent);
+  opacity: 0;
+  translate: var(--ghost-x, -100px) var(--ghost-y, -100px);
+  transition:
+    opacity var(--transition-fast),
+    scale var(--transition-fast);
+}
+
+.ghost-cursor.is-visible {
+  opacity: 0.8;
+}
+
+.ghost-cursor.is-active {
+  opacity: 1;
+  scale: 1.5;
 }
 
 /* Back-to-top — appears after scrolling, smooth-scrolls to the top */
