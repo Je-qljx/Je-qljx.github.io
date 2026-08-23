@@ -393,26 +393,6 @@ pre code {
   --ripple-color: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
-/* Scroll progress bar — top edge of the viewport, terminal phosphor */
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: var(--z-overlay);
-  height: 3px;
-  pointer-events: none;
-  background: linear-gradient(90deg, var(--accent), var(--terminal-accent));
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  visibility: hidden;
-}
-
-html.motion-ok .scroll-progress {
-  visibility: visible;
-}
-
 /* Click ripple — expanding accent ring spawned at the pointer position */
 .ripple {
   position: fixed;

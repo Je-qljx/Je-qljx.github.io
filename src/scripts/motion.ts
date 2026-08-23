@@ -22,21 +22,15 @@
   }
 
   /* ----------------------------------------------------------------------
-     Scroll state — progress bar, header elevation, back-to-top.
+     Scroll state — header elevation, back-to-top.
      One passive listener, rAF-throttled.
      ---------------------------------------------------------------------- */
-  const progress = document.getElementById('scroll-progress');
   const header = document.querySelector('.site-header');
   const backToTop = document.querySelector('.back-to-top');
 
   let ticking = false;
   function updateScrollState() {
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - window.innerHeight;
     const y = window.scrollY;
-    if (progress && max > 0) {
-      progress.style.transform = `scaleX(${(y / max).toFixed(4)})`;
-    }
     if (header) header.classList.toggle('is-scrolled', y > 8);
     if (backToTop) backToTop.classList.toggle('is-visible', y > 600);
   }
