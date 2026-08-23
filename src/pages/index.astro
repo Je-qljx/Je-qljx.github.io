@@ -292,22 +292,10 @@ const featured = (await getCollection('projects'))
   }
 
   .terminal:hover {
-    border-color: color-mix(
-      in srgb,
-      var(--terminal-accent) 40%,
-      var(--terminal-border)
-    );
     box-shadow:
       var(--shadow-lg),
-      0 0 28px color-mix(in srgb, var(--terminal-accent) 14%, transparent);
-  }
-
-  .terminal:hover .terminal-bar {
-    background-color: color-mix(
-      in srgb,
-      var(--terminal-accent) 6%,
-      transparent
-    );
+      0 0 36px rgb(var(--shadow-color) / 0.35),
+      0 0 10px rgb(var(--shadow-color) / 0.28);
   }
 
   .terminal-bar {
