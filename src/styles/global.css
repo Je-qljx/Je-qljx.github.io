@@ -270,6 +270,25 @@ pre code {
   background-color: transparent;
 }
 
+table {
+  width: 100%;
+  margin: 0 0 var(--space-4);
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+th,
+td {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  background-color: var(--surface-muted);
+  font-weight: 600;
+}
+
 /* Keyboard focus — visible everywhere, WCAG 2.4.7 */
 :focus-visible {
   outline: 2px solid var(--accent);
