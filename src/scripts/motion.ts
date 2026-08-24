@@ -149,7 +149,7 @@
        out at the last position so re-entry never jumps to the center. */
     const spotTargets = Array.from(
       document.querySelectorAll<HTMLElement>(
-        '.featured-card, .project-card, .post-card, .matrix-card, .contact-link',
+        '.featured-card, .project-card, .post-card, .matrix-card, .matrix-row, .contact-link',
       ),
     );
 
@@ -209,7 +209,7 @@
        while the frame is catching up with its target. */
     const FRAME_INTERACTIVE = 'a, button';
     const FRAME_EXCLUDE =
-      '.featured-card, .project-card, .post-card, .matrix-card, .contact-link';
+      '.featured-card, .project-card, .post-card, .matrix-card, .matrix-row, .contact-link';
     const FRAME_PAD = 4;
 
     const selFrame = document.createElement('span');

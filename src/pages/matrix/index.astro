@@ -1,25 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
-interface MatrixEntry {
-  name: string;
-  url: string;
-  relation: string;
-  description: string;
-  tags: string[];
-}
-
-// 与我有关的人和团队。新增条目直接往这里加即可。
-const entries: MatrixEntry[] = [
-  {
-    name: '新技元 OriGen',
-    url: 'https://origenclub.cn/',
-    relation: '团队成员',
-    description:
-      '江苏省常州高级中学的技术驱动学生社团，专注于技术创新与实践，涵盖直播、设计、开发与摄影等方向。',
-    tags: ['学生社团', '技术创新'],
-  },
-];
+import { matrixEntries } from '../../data/matrix';
 ---
 
 <BaseLayout title="矩阵 · Je" description="与我有关的人和团队">
@@ -34,18 +15,20 @@ const entries: MatrixEntry[] = [
 
     <ul class="matrix-grid">
       {
-        entries.map((entry, i) => (
+        matrixEntries.map((entry, i) => (
           <li class="matrix-card" data-reveal data-reveal-delay={(i % 4) * 80}>
             <div class="matrix-top">
               <h2 class="matrix-name">
                 <a href={entry.url} target="_blank" rel="noopener noreferrer">
                   {entry.name}
-                  <span class="external-mark" aria-hidden="true">↗</span>
                 </a>
               </h2>
               <span class="relation">{entry.relation}</span>
             </div>
             <p class="matrix-desc">{entry.description}</p>
+            {
+              entry.role && <p class="matrix-role">{entry.role}</p>
+            }
             <ul class="tag-list" aria-label="标签">
               {entry.tags.map((tag) => (
                 <li class="tag">{tag}</li>
@@ -140,13 +123,6 @@ const entries: MatrixEntry[] = [
     color: var(--accent);
   }
 
-  .external-mark {
-    margin-left: 0.25em;
-    font-family: var(--font-mono);
-    font-size: 0.8em;
-    color: var(--accent);
-  }
-
   .relation {
     flex-shrink: 0;
     padding: 0.125rem 0.625rem;
@@ -160,6 +136,16 @@ const entries: MatrixEntry[] = [
 
   .matrix-desc {
     margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .matrix-role {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background-color: var(--accent-soft);
     color: var(--text-secondary);
     font-size: var(--text-small);
   }

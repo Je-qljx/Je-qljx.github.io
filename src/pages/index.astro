@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { config } from '../config';
 import avatar from '../assets/avatar.svg?url';
+import { matrixEntries } from '../data/matrix';
 
 const featured = (await getCollection('projects'))
   .filter((project) => project.data.featured)
@@ -14,7 +15,7 @@ const featured = (await getCollection('projects'))
   title={`${config.name} · 个人主页`}
   description={`${config.name} 的个人主页`}
 >
-  <!-- 首页：hero / 关于 / 精选项目 / 联系 -->
+  <!-- 首页：hero / 关于 / 精选项目 / 矩阵 / 联系 -->
   <section class="hero">
     <div class="container hero-inner">
       <p class="hero-eyebrow" data-reveal>~/Je</p>
@@ -95,6 +96,33 @@ const featured = (await getCollection('projects'))
       </ul>
       <a class="all-link" href="/projects/" data-reveal data-reveal-delay="120">
         查看全部项目
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="matrix">
+    <div class="container">
+      <p class="section-eyebrow" data-reveal>~/Je/matrix</p>
+      <h2 data-reveal data-reveal-delay="60">矩阵</h2>
+      <ul class="matrix-list">
+        {
+          matrixEntries.map((entry, i) => (
+            <li class="matrix-row" data-reveal data-reveal-delay={i * 100}>
+              <div class="matrix-top">
+                <h3 class="matrix-name">
+                  <a href={entry.url} target="_blank" rel="noopener noreferrer">
+                    {entry.name}
+                  </a>
+                </h3>
+                <span class="relation">{entry.relation}</span>
+              </div>
+              <p class="matrix-desc">{entry.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="all-link" href="/matrix/" data-reveal data-reveal-delay="120">
+        查看完整矩阵
       </a>
     </div>
   </section>
@@ -543,6 +571,83 @@ const featured = (await getCollection('projects'))
 
   .all-link {
     font-weight: 600;
+  }
+
+  /* matrix */
+  .matrix-list {
+    margin: 0 0 var(--space-8);
+    padding: 0;
+    list-style: none;
+  }
+
+  .matrix-list li + li {
+    margin-top: var(--space-6);
+  }
+
+  .matrix-row {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: box-shadow var(--transition-base);
+  }
+
+  .matrix-row:hover {
+    box-shadow:
+      var(--shadow-md),
+      0 0 38px rgb(var(--shadow-color) / 0.4),
+      0 0 12px rgb(var(--shadow-color) / 0.3);
+  }
+
+  .matrix-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .matrix-name {
+    margin: 0;
+    font-size: var(--text-h3);
+  }
+
+  .matrix-name a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  /* The title link stretches over the whole row, so any click lands there. */
+  .matrix-name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .matrix-name a:hover {
+    color: var(--accent);
+  }
+
+  .relation {
+    flex-shrink: 0;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    white-space: nowrap;
+  }
+
+  .matrix-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-small);
   }
 
   /* contact */
