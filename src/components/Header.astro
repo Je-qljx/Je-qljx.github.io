@@ -202,7 +202,6 @@ const nav = [
   .site-path {
     display: inline-flex;
     align-items: baseline;
-    gap: var(--space-1);
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -231,7 +230,7 @@ const nav = [
     padding: 0;
     list-style: none;
     font-family: var(--font-mono);
-    font-size: var(--text-mono);
+    font-size: var(--text-body);
   }
 
   .path-rest[hidden] {
@@ -348,23 +347,25 @@ const nav = [
     min-width: 0;
   }
 
+  .path-rest::before {
+    content: '/';
+    margin: 0 var(--space-1);
+    color: var(--accent);
+  }
+
   .path-rest li + li::before {
     content: '/';
     margin: 0 var(--space-1);
-    color: var(--text-muted);
+    color: var(--accent);
   }
 
   .path-seg {
-    color: var(--text-secondary);
+    color: var(--accent);
     text-decoration: none;
     transition: color var(--transition-fast);
   }
 
-  .path-rest [aria-current] {
-    color: var(--text);
-  }
-
   a.path-seg:hover {
-    color: var(--accent);
+    color: var(--accent-strong);
   }
 </style>
