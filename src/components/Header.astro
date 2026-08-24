@@ -11,10 +11,13 @@ const nav = [
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="site-name" href="/" aria-label={`${config.name} 首页`}>
-      <span class="site-name-mark" aria-hidden="true">~/</span>
-      <span class="site-name-text">{config.name}</span>
-    </a>
+    <nav class="site-path" aria-label="当前路径">
+      <a class="path-home" href="/" aria-label={`${config.name} 首页`}>
+        <span class="path-mark" aria-hidden="true">~/</span>
+        <span>{config.name}</span>
+      </a>
+      <ol class="path-rest" data-path-rest hidden></ol>
+    </nav>
 
     <nav class="site-nav" aria-label="主导航">
       <ul class="nav-list">
@@ -79,28 +82,56 @@ const nav = [
 <script is:inline>
   (function () {
     function init() {
-      var el = document.querySelector('.site-name-text');
-      if (!el) return;
-      var root = el.textContent;
-      var path = location.pathname.replace(/^\/+|\/+$/g, '');
-      var base = path ? root + '/' + path : root;
+      var rest = document.querySelector('[data-path-rest]');
+      if (!rest) return;
 
-      function setText(next, animate) {
-        if (!next || el.textContent === next) return;
-        el.textContent = next;
+      // Path segments that are real pages link there; 'about' only exists as a
+      // homepage section, so it anchors to the section instead.
+      var PAGE_HREFS = { projects: '/projects/', blog: '/blog/', contact: '/contact/' };
+      var curPath = location.pathname.replace(/\/+$/, '') || '/';
+      var current;
+
+      function render(suffix, animate, tailIsCurrent) {
+        if (suffix === current) return;
+        current = suffix;
+
+        while (rest.firstChild) rest.removeChild(rest.firstChild);
+        var parts = suffix ? suffix.split('/') : [];
+        for (var i = 0; i < parts.length; i += 1) {
+          var part = parts[i];
+          var li = document.createElement('li');
+          var isTail = i === parts.length - 1;
+          var mapped = PAGE_HREFS[part];
+          var node;
+          // The trailing segment of a real path is the page you are on, so it
+          // renders as plain text; homepage section crumbs always link.
+          if ((tailIsCurrent && isTail) || (mapped && mapped.replace(/\/+$/, '') === curPath)) {
+            node = document.createElement('span');
+            node.setAttribute('aria-current', 'page');
+          } else {
+            node = document.createElement('a');
+            node.href = mapped || '/#' + part;
+          }
+          node.className = 'path-seg';
+          node.textContent = part;
+          li.appendChild(node);
+          rest.appendChild(li);
+        }
+        rest.hidden = parts.length === 0;
+
         if (!animate || !document.documentElement.classList.contains('motion-ok')) {
           return;
         }
-        el.classList.remove('name-pop');
-        void el.offsetWidth;
-        el.classList.add('name-pop');
+        rest.classList.remove('name-pop');
+        void rest.offsetWidth;
+        rest.classList.add('name-pop');
       }
 
+      var base = location.pathname.replace(/^\/+|\/+$/g, '');
+      render(base, false, true);
+
       var sections = document.querySelectorAll('main section[id]');
-      if (!sections.length) {
-        setText(base, false);
-        return;
-      }
+      if (!sections.length) return;
 
       var visible = [];
       var lastActive = null;
@@ -116,9 +147,8 @@ const nav = [
           for (var s = 0; s < sections.length; s += 1) {
             if (visible.indexOf(sections[s]) !== -1) active = sections[s];
           }
-          if (active) lastActive = root + '/' + active.id;
-          var next = active ? lastActive : window.scrollY === 0 ? base : lastActive;
-          setText(next, true);
+          if (active) lastActive = active.id;
+          render(active ? lastActive : window.scrollY === 0 ? base : lastActive, true);
         },
         { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
       );
@@ -130,7 +160,7 @@ const nav = [
         'scroll',
         function () {
           if (!visible.length && window.scrollY === 0) {
-            setText(base, true);
+            render(base, true);
           }
         },
         { passive: true }
@@ -169,20 +199,43 @@ const nav = [
     min-height: 3.5rem;
   }
 
-  .site-name {
+  .site-path {
     display: inline-flex;
     align-items: baseline;
     gap: var(--space-1);
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .path-home {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: var(--text-body);
     color: var(--accent);
     text-decoration: none;
   }
 
-  .site-name-mark {
-    color: var(--accent);
+  .path-mark {
+    font-size: var(--text-mono);
+  }
+
+  .path-rest {
+    display: inline-flex;
+    align-items: baseline;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     font-family: var(--font-mono);
     font-size: var(--text-mono);
+  }
+
+  .path-rest[hidden] {
+    display: none;
   }
 
   .site-nav {
@@ -267,7 +320,7 @@ const nav = [
     }
   }
 
-  html.motion-ok .site-name-text.name-pop {
+  html.motion-ok .path-rest.name-pop {
     animation: name-pop 280ms var(--ease-out);
   }
 
@@ -283,5 +336,35 @@ const nav = [
     .nav-list {
       gap: var(--space-4);
     }
+  }
+</style>
+
+<!-- Crumb <li>/<a> nodes are built by the script at runtime, so they never
+     carry Astro's scoped attribute — these rules must stay unscoped. -->
+<style is:global>
+  .path-rest li {
+    display: inline-flex;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .path-rest li + li::before {
+    content: '/';
+    margin: 0 var(--space-1);
+    color: var(--text-muted);
+  }
+
+  .path-seg {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .path-rest [aria-current] {
+    color: var(--text);
+  }
+
+  a.path-seg:hover {
+    color: var(--accent);
   }
 </style>
