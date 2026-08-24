@@ -37,6 +37,18 @@ import { matrixEntries } from '../../data/matrix';
           </li>
         ))
       }
+      <li
+        class="matrix-card matrix-slot"
+        data-reveal
+        data-reveal-delay={(matrixEntries.length % 4) * 80}
+      >
+        <h2 class="matrix-name">
+          <a href="/contact/">虚位以待</a>
+        </h2>
+        <p class="matrix-desc">
+          这里为你留了一个位置。如果我们之间有所交集，欢迎通过联系页面告诉我，加入我的矩阵。
+        </p>
+      </li>
     </ul>
   </div>
 </BaseLayout>
@@ -166,5 +178,13 @@ import { matrixEntries } from '../../data/matrix';
     color: var(--accent-strong);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
+  }
+
+  /* 空位邀请卡：虚线框 + 透明底，示意「这里还空着」。 */
+  .matrix-slot {
+    justify-content: center;
+    border-style: dashed;
+    background-color: transparent;
+    box-shadow: none;
   }
 </style>
