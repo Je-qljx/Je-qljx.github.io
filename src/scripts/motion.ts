@@ -67,7 +67,7 @@
      ---------------------------------------------------------------------- */
   if (motionOk) {
     const RIPPLE_SELECTOR =
-      'button, a[href], [data-ripple], .featured-card, .project-card, .post-card, .tag, .contact-link';
+      'button, a[href], [data-ripple], .featured-card, .project-card, .post-card, .matrix-card, .tag, .contact-link';
 
     document.addEventListener('pointerdown', (event) => {
       const target = event.target as Element | null;
@@ -149,7 +149,7 @@
        out at the last position so re-entry never jumps to the center. */
     const spotTargets = Array.from(
       document.querySelectorAll<HTMLElement>(
-        '.featured-card, .project-card, .post-card, .contact-link',
+        '.featured-card, .project-card, .post-card, .matrix-card, .contact-link',
       ),
     );
 
@@ -209,7 +209,7 @@
        while the frame is catching up with its target. */
     const FRAME_INTERACTIVE = 'a, button';
     const FRAME_EXCLUDE =
-      '.featured-card, .project-card, .post-card, .contact-link';
+      '.featured-card, .project-card, .post-card, .matrix-card, .contact-link';
     const FRAME_PAD = 4;
 
     const selFrame = document.createElement('span');

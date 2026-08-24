@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface MatrixEntry {
+  name: string;
+  url: string;
+  relation: string;
+  description: string;
+  tags: string[];
+}
+
+// 与我有关的人和团队。新增条目直接往这里加即可。
+const entries: MatrixEntry[] = [
+  {
+    name: '新技元 OriGen',
+    url: 'https://origenclub.cn/',
+    relation: '团队成员',
+    description:
+      '江苏省常州高级中学的技术驱动学生社团，专注于技术创新与实践，涵盖直播、设计、开发与摄影等方向。',
+    tags: ['学生社团', '技术创新'],
+  },
+];
+---
+
+<BaseLayout title="矩阵 · Je" description="与我有关的人和团队">
+  <div class="container section">
+    <header class="page-head">
+      <p class="page-eyebrow" data-reveal>~/matrix</p>
+      <h1 data-reveal data-reveal-delay="60">矩阵</h1>
+      <p class="page-intro" data-reveal data-reveal-delay="120">
+        与我有关的伙伴与团队。
+      </p>
+    </header>
+
+    <ul class="matrix-grid">
+      {
+        entries.map((entry, i) => (
+          <li class="matrix-card" data-reveal data-reveal-delay={(i % 4) * 80}>
+            <div class="matrix-top">
+              <h2 class="matrix-name">
+                <a href={entry.url} target="_blank" rel="noopener noreferrer">
+                  {entry.name}
+                  <span class="external-mark" aria-hidden="true">↗</span>
+                </a>
+              </h2>
+              <span class="relation">{entry.relation}</span>
+            </div>
+            <p class="matrix-desc">{entry.description}</p>
+            <ul class="tag-list" aria-label="标签">
+              {entry.tags.map((tag) => (
+                <li class="tag">{tag}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: var(--space-12);
+  }
+
+  .page-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--accent);
+  }
+
+  .page-intro {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .matrix-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .matrix-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: box-shadow var(--transition-base);
+  }
+
+  .matrix-card:hover {
+    box-shadow:
+      var(--shadow-md),
+      0 0 38px rgb(var(--shadow-color) / 0.4),
+      0 0 12px rgb(var(--shadow-color) / 0.3);
+  }
+
+  .matrix-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .matrix-name {
+    margin: 0;
+    font-size: var(--text-h3);
+  }
+
+  .matrix-name a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  /* The title link stretches over the whole card, so any click lands there. */
+  .matrix-name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .matrix-name a:hover {
+    color: var(--accent);
+  }
+
+  .external-mark {
+    margin-left: 0.25em;
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--accent);
+  }
+
+  .relation {
+    flex-shrink: 0;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    white-space: nowrap;
+  }
+
+  .matrix-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: auto 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag {
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+</style>

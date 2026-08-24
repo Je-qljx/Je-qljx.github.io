@@ -5,6 +5,7 @@ const nav = [
   { href: '/', label: '首页' },
   { href: '/projects', label: '项目' },
   { href: '/blog', label: '博客' },
+  { href: '/matrix/', label: '矩阵' },
   { href: '/contact/', label: '联系' },
 ];
 ---
@@ -87,7 +88,7 @@ const nav = [
 
       // Path segments that are real pages link there; 'about' only exists as a
       // homepage section, so it anchors to the section instead.
-      var PAGE_HREFS = { projects: '/projects/', blog: '/blog/', contact: '/contact/' };
+      var PAGE_HREFS = { projects: '/projects/', blog: '/blog/', matrix: '/matrix/', contact: '/contact/' };
       var curPath = location.pathname.replace(/\/+$/, '') || '/';
       var current;
 
