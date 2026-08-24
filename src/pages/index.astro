@@ -506,6 +506,13 @@ const featured = (await getCollection('projects'))
     text-decoration: none;
   }
 
+  /* The title link stretches over the whole card, so any click lands there. */
+  .featured-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   .featured-title a:hover {
     color: var(--accent);
   }

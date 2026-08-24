@@ -115,6 +115,14 @@ const projects = (await getCollection('projects')).sort(
     text-decoration: none;
   }
 
+  /* The title link stretches over the whole card, so any click lands there.
+     Inner links (.project-link) stay above it via their own position. */
+  .project-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   .project-title a:hover {
     color: var(--accent);
   }
@@ -150,6 +158,7 @@ const projects = (await getCollection('projects')).sort(
   }
 
   .project-link {
+    position: relative;
     font-size: var(--text-small);
     font-weight: 600;
   }

@@ -116,6 +116,13 @@ const dateFormat = new Intl.DateTimeFormat('zh-CN', {
     text-decoration: none;
   }
 
+  /* The title link stretches over the whole card, so any click lands there. */
+  .post-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   .post-title a:hover {
     color: var(--accent);
   }
