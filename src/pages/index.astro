@@ -69,7 +69,9 @@ const featured = (await getCollection('projects'))
             <span class="terminal-title">~/Je/about</span>
           </div>
           <pre class="terminal-body"><code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat about.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
-<code class="terminal-output" data-output hidden>{config.bio}</code></pre>
+<code class="terminal-output" data-output hidden>{config.bio}</code>
+<code><span class="terminal-prompt">$ </span><span class="terminal-cmd" data-type>cat skills.txt</span><span class="terminal-cursor" aria-hidden="true"></span></code>
+<code class="terminal-output" data-output hidden>{config.capabilities.join(' · ')}</code></pre>
         </div>
       </div>
     </div>
