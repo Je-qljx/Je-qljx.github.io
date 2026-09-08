@@ -205,11 +205,14 @@
     /* Terminal selection frame — glides onto the hovered link or button
        and wraps it; hides over plain content. Glow elements (cards,
        contact buttons) are excluded: they already carry the orange glow
-       and a green frame on top reads as noise. The rAF loop runs only
-       while the frame is catching up with its target. */
+       and a green frame on top reads as noise. Header interactives
+       (nav labels, theme toggle) are excluded too: their hover already
+       has its own underline/ring feedback, so a wrapping box is
+       redundant there. The rAF loop runs only while the frame is
+       catching up with its target. */
     const FRAME_INTERACTIVE = 'a, button';
     const FRAME_EXCLUDE =
-      '.featured-card, .project-card, .post-card, .matrix-card, .matrix-row, .contact-link';
+      '.featured-card, .project-card, .post-card, .matrix-card, .matrix-row, .contact-link, .site-header';
     const FRAME_PAD = 4;
 
     const selFrame = document.createElement('span');

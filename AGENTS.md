@@ -24,6 +24,7 @@ If `astro sync`/`dev`/`build` fail with `require is not defined` under newer Nod
 
 - `src/config.ts`: site identity/socials. `src/data/matrix.ts`: entries shared by the homepage `#matrix` section and the `/matrix/` page.
 - Content collections live in `src/content/blog` and `src/content/projects`, with Zod schemas in `src/content.config.ts`. Blog posts support `draft: true`; projects sort by `order`, and the homepage features those with `featured: true`.
+- Project page body (介绍) is copied verbatim from the corresponding git repository's README: mirror its full content, dropping only the repo's top-level `#` title line (it duplicates the frontmatter `title` heading) and leaving the rest of sections/tables/code intact.
 - Adding a top-level page requires updating BOTH the `nav` array and the breadcrumb `PAGE_HREFS` map in `src/components/Header.astro`.
 - Cards use the stretched-link pattern (title link gets an `::after` with `inset: 0`; card is `position: relative`) so the whole card is clickable. Hover spotlight/ghost-frame effects are class-driven in `src/scripts/motion.ts` (`RIPPLE_SELECTOR`, spot targets, `FRAME_EXCLUDE`) — register new card classes there.
 - Styles use design tokens from `src/styles/global.css` (e.g. `--space-*`, `--text-*`, `--accent-*`) inside scoped component styles.
@@ -31,7 +32,7 @@ If `astro sync`/`dev`/`build` fail with `require is not defined` under newer Nod
 
 ## Notes
 
-- `CLAUDE.md` is a hardlink to this file; editing one updates both.
+- This file (`AGENTS.md`) is the single source of project instructions (no `CLAUDE.md`).
 - Theme is light/dark via `localStorage` + `prefers-color-scheme`; motion effects degrade gracefully under `prefers-reduced-motion` and without JS.
 
 ## Documentation

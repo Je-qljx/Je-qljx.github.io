@@ -35,7 +35,7 @@ const projects = (await getCollection('projects')).sort(
             <div class="project-links">
               {project.data.githubUrl && (
                 <a class="project-link" href={project.data.githubUrl}>
-                  源码
+                  下载/源码
                 </a>
               )}
               {project.data.demoUrl && (
